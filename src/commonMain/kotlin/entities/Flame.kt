@@ -1,15 +1,12 @@
 package entities
 
-import bitmapDB
 import com.soywiz.klock.*
-import com.soywiz.korge.animate.*
 import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.*
-import core.level.*
+import load.*
 import ui.level.*
 
-class Flame(val world: World, col: Int, row: Int): Sprite() {
-    private val spriteMap = bitmapDB.getBitmap("items/explosion_red - Copy.png")
+class Flame(val layer: Layer, col: Int, row: Int): Sprite() {
+    private val spriteMap = BitmapDB.getBitmap("items/explosion_red.png")
 
     private val animation = SpriteAnimation(
         spriteMap = spriteMap,
@@ -22,11 +19,16 @@ class Flame(val world: World, col: Int, row: Int): Sprite() {
         byRows = false
     )
 
+    /* Get location of this component, this method equivalent to View.pos
+       but return Pair<Double, Double> instead of IPoint */
+    val loc: Pair<Double, Double>
+        get() = x to y
+
     init {
-        addTo(world.putLayer)
+        addTo(layer)
         anchor(0.5, 0.5)
-        x = col*45.0 + 23.0
-        y = row*45.0 + 23.0
+        x = col*45.0 + 22.0
+        y = row*45.0 + 22.0
 
         playAnimation(animation, spriteDisplayTime = 50.milliseconds)
         onAnimationStopped.invoke {

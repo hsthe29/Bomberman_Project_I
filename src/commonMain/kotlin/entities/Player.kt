@@ -20,7 +20,7 @@ data class PlayerAnimation(
     val spriteAnimationDown: SpriteAnimation
 )
 
-data class Backpack(var hp: Int = 3000, var speed: Double = 2.0, var maxBomb: Int = 5, var bombCount: Int = 0, var blastRange: Int = 2, var damage: Int = 1)
+data class Backpack(var hp: Int = 300, var speed: Double = 2.0, var maxBomb: Int = 5, var bombCount: Int = 0, var blastRange: Int = 2, var damage: Int = 1)
 
 suspend inline fun World.player(callback: @ViewDslMarker Player.() -> Unit = {}): Player {
     val spriteMap = resourcesVfs["player-skin.png"].readBitmap()
@@ -28,9 +28,9 @@ suspend inline fun World.player(callback: @ViewDslMarker Player.() -> Unit = {})
         .addTo(this, callback)
 }
 
-class Player(val world: World,
-             val animations: PlayerAnimation,
-             /*upKey: Key, downKey: Key, leftKey: Key, rightKey: Key*/
+class Player(
+    private val world: World,
+    private val animations: PlayerAnimation,
 ) : Sprite(animations.spriteAnimationDown) {
     companion object {
         fun animations(spriteMap: Bitmap): PlayerAnimation = PlayerAnimation(
@@ -73,7 +73,11 @@ class Player(val world: World,
         )
     }
 
-    /** Allows to know the appropriate moment to stop the movement animation. */
+    /* Get location of this component, this method equivalent to View.pos
+       but return Pair<Double, Double> instead of IPoint */
+    val loc: Pair<Double, Double>
+        get() = x to y
+
     /** Allows to know the appropriate moment to stop the movement animation. */
     private val backpack = Backpack()
 
@@ -124,9 +128,7 @@ class Player(val world: World,
             val col = (this.x/45.0).toInt()
             if(!world.putLayer.occupied(col, row)) {
                 backpack.bombCount++
-                Bomb(world, this.x, this.y).apply {
-                    ticking(this@Player)
-                }
+                world.putBombAt(this, col, row)
             }
         }
     }

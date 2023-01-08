@@ -31,9 +31,15 @@ open class OImage(
         type: TileType = TileType.NONE
     ) : this(bitmap.slice(), anchorX, anchorY, hitShape, smoothing, type)
 
+    /* Get location of this component, this method equivalent to View.pos
+       but return Pair<Double, Double> instead of IPoint */
+    val loc: Pair<Double, Double>
+        get() = x to y
+
     override fun createInstance(): View = Image(bitmap, anchorX, anchorY, hitShape, smoothing)
 
     override fun renderInternal(ctx: RenderContext) {
+        pos
         lazyLoadRenderInternal(ctx, this)
         super.renderInternal(ctx)
     }
@@ -75,8 +81,3 @@ open class OImage(
 inline fun Layer.tile(bitmap: Bitmap, callback: @ViewDslMarker OImage.() -> Unit = {}): OImage {
     return OImage(bitmap).addTo(this, callback)
 }
-
-inline fun Container.tile(bitmap: Bitmap, callback: @ViewDslMarker OImage.() -> Unit = {}): OImage {
-    return OImage(bitmap).addTo(this, callback)
-}
-

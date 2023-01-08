@@ -1,8 +1,8 @@
 package ui
 
-import bitmapDB
 import com.soywiz.kds.iterators.*
 import com.soywiz.klock.*
+import com.soywiz.korge.animate.*
 import com.soywiz.korge.input.*
 import com.soywiz.korge.scene.*
 import com.soywiz.korge.tween.*
@@ -13,64 +13,40 @@ import com.soywiz.korim.format.*
 import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
-import core.base.*
-import gameState
 import load.*
 import ui.component.*
 import kotlin.system.*
 
-class Lobby(private val mapOrder: Int):Scene() {
+class Lobby(val map: Int):Scene() {
     private lateinit var background: Container
     private lateinit var nextMap: Image
-
 
     init {
 
     }
     override suspend fun SContainer.sceneInit() {
         background = container {
-            image(bitmapDB.getBitmap("backgrounds/map_process_${mapOrder}.png")) {
+            image(BitmapDB.getBitmap("backgrounds/map_process_${map}.png")) {
                 anchor(.5, .5)
                 scale(1.0)
                 position(700, 400)
             }
-            val position = gameState.position[mapOrder]!!
-            val curLevel = gameState.level
+            val position = GameState.mapOf(map)
 
-            val games = Array(position.size) {
-                val value = position[it]
-                entry(it, value.passed, value.checkpoint, resourcesVfs[value.url].readBitmap()) {
+            position.fastForEachWithIndex { id, value ->
+                entry(this@Lobby, id, value) {
                     scale(0.3)
-                    position(value.x, value.y)
                     mouse {
                         onOver { scale = 0.35 }
                         onOut { scale = 0.3 }
                     }
                 }
             }
-
-            for((i, game) in games.withIndex()) {
-                game.onClick {
-                    if (gameState.map >= mapOrder && game.level <= curLevel) {
-                        println("${gameState.map}, ${mapOrder}")
-                        sceneContainer.changeTo({
-                            PlayScreen(
-                                game.isCheckPoint,
-                                getTileMap( "databases/stage-${gameState.map}_level-${gameState.level}.json")
-                                    .data)
-                        })
-                    } else {
-                        println("hihi")
-                        notifyMessage("You have to complete previous level first!")
-                    }
-                }
-
-            }
-            nextMap = image(bitmapDB.getBitmap("icons/nv-button-${mapOrder}.png")) {
+            nextMap = image(BitmapDB.getBitmap("icons/nv-button-${map}.png")) {
                 alpha = 0.7
                 anchor(0.5, 0.5)
                 scale(0.2)
-                position((1 - mapOrder * 2) * 650 + 700, 400)
+                position((1 - map * 2) * 650 + 700, 400)
                 mouse {
                     onOver {
                         scale = 0.25
@@ -83,32 +59,22 @@ class Lobby(private val mapOrder: Int):Scene() {
                 }
             }
             container {
-                roundRect(300, 60, 5, fill = Colors.WHITE)
-                position(1100, 0)
-//                text(
-//                    "${gameState.gold}",
-//                    font = plaguard,
-//                    textSize = 25.0,
-//                    color = Colors["#ffa700"],
-//                    alignment = TextAlignment.MIDDLE_CENTER
-//                ) {
-//                    mouse {
-//                        onOver { scale = 1.1 }
-//                        onOut { scale = 1.0 }
-//                    }
-//                }.xy(60, 30)
-                image(bitmapDB.getBitmap("icons/cancel-dark.png")) {
+                roundRect(60, 60, 10, fill = Colors.WHITE) {
+                    anchor(0.5, 0.5)
+                    xy(1360.0, 40.0)
+                }
+                image(BitmapDB.getBitmap("icons/cancel-dark.png")) {
                     anchor(0.5, 0.5)
                     scale(0.1)
-                    position(250, 30)
+                    position(1360, 40)
                     mouse {
                         onOver {
                             scale = 0.12
-                            bitmap = bitmapDB.getBitmap("icons/cancel-light.png").slice()
+                            bitmap = BitmapDB.getBitmap("icons/cancel-light.png").slice()
                         }
                         onOut {
                             scale = 0.1
-                            bitmap = bitmapDB.getBitmap("icons/cancel-dark.png").slice()
+                            bitmap = BitmapDB.getBitmap("icons/cancel-dark.png").slice()
                         }
                     }
                     onClick { exitProcess(0) }
@@ -127,7 +93,7 @@ class Lobby(private val mapOrder: Int):Scene() {
                     scale(0.3)
                     position(700, 400)
                 }
-                if(mapOrder == 1)
+                if(map == 1)
                     sceneContainer.changeTo({ Lobby(0) })
                 else sceneContainer.changeTo({ Lobby(1) })
 
@@ -135,15 +101,32 @@ class Lobby(private val mapOrder: Int):Scene() {
         }
     }
 
-    private suspend fun notifyMessage(msg: String) {
-        Text(msg).apply {
-            addTo(background)
-            textSize = 35.0
-            font = blomberg
-            x = 700.0 - 0.5*width
-            tween(this::y[50.0, 40.0], time = 0.5.seconds, easing = Easing.EASE_IN_OUT)
-            tween(this::y[40.0, -10.0], time = 0.5.seconds, easing = Easing.EASE_IN_OUT)
-            removeFromParent()
+    suspend fun notifyMessage(msg: String, textSize: Double = 35.0, backColor: RGBA = Colors.BLACK, frontColor: RGBA = Colors.WHITE) {
+        with(background) {
+            val back = text(msg) {
+                this.textSize = textSize
+                font = TextFont.blomberg
+                color = backColor
+                x = 700.0 - 0.5 * width-2.0
+                y = 50.0 - 0.5 * height+2.0
+            }
+            val front = text(msg) {
+                this.textSize = textSize
+                font = TextFont.blomberg
+                color = frontColor
+                x = 700.0 - 0.5 * width
+                y = 50.0 - 0.5 * height
+            }
+            animateParallel {
+                tween(back::y[40.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)
+                tween(front::y[40.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)
+            }
+            animateParallel {
+                tween(back::y[40.0, -30.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)
+                tween(front::y[40.0, -30.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)
+            }
+            back.removeFromParent()
+            front.removeFromParent()
         }
     }
 

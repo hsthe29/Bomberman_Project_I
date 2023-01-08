@@ -9,6 +9,6 @@ data class TileInfo(val url: String,
                     val type: TileType = TileType.NONE,
                     val row: Int, val col: Int)
 
-data class TileLayer(val layerName: String, val tileInfo: List<TileInfo>)
-data class TileMap(val data: List<TileLayer>)
+data class LayerInfo(val layerName: String, val tileInfo: List<TileInfo>)
+//data class TileMap(val data: List<LayerInfo>)
 

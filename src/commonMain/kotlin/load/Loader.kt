@@ -1,25 +1,47 @@
 package load
 
-import gson
-import java.io.*
-import java.lang.reflect.*
+//object GameState
+val urls = arrayOf(
+        "backgrounds/map_process_0.png",
+        "backgrounds/map_process_1.png",
+        "icons/exit-button-colored.png",
+        "icons/exit-button.png",
+        "icons/start-button-colored.png",
+        "icons/start-button.png",
+        "icons/settings-button-colored.png",
+        "icons/settings-button.png",
+        "icons/nv-button-1.png",
+        "icons/nv-button-0.png",
+        "icons/cancel-dark.png",
+        "icons/cancel-light.png",
+        "tiles/dark-floor-1.png",
+        "tiles/floor-grass-1.png",
+        "tiles/floor-grass-2.png",
+        "tiles/floor-grass-3.png",
+        "tiles/floor-grass-4.png",
+        "tiles/stone-ice-1.png",
+        "tiles/stone-ice-2.png",
+        "tiles/stone-ice-3.png",
+        "tiles/stone-1.png",
+        "tiles/stone-2.png",
+        "tiles/stone-3.png",
+        "items/doorclosed.png",
+        "items/dooropen.png",
+        "items/bombamount.png",
+        "items/key.png",
+        "items/powerup_heart.png",
+        "items/powerup_sword.png",
+        "items/speedup.png",
+        "items/bombpower.png",
+        "items/heartfull.png",
+        "tiles/brick-2.png",
+        "items/bomb.png",
+        "items/flame.png",
+        "items/icebomb.png",
+        "items/explosion_red.png",
+        "levels/entry_star.png",
+        "levels/entry_star_passed.png",
+        "levels/checkpoint_0.png",
+        "levels/checkpoint_1.png"
+)
 
-fun readGameState(): GameState {
-    val br = BufferedReader(FileReader("databases/gamestate.json"))
-    val res = gson.fromJson<GameState>(br, GameState::class.java as Type)
-    br.close()
-    return res
-}
-
-fun saveGameState(gameState: GameState) {
-    val bw = BufferedWriter(FileWriter("databases/gamestate.json"))
-    bw.write(gson.toJson(gameState))
-    bw.close()
-}
-
-fun getTileMap(url: String): TileMap {
-    val br = BufferedReader(FileReader(url))
-    val res = gson.fromJson<TileMap>(br, TileMap::class.java as Type)
-    br.close()
-    return res
-}

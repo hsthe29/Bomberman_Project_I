@@ -1,26 +1,27 @@
 package entities.tiles
 
 import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.*
-import com.soywiz.korio.resources.*
 import core.base.*
 import load.*
 import ui.level.*
 
-class Ground(bitmap: Resourceable<out BaseBmpSlice>,
-           anchorX: Double = 0.0,
-           anchorY: Double=0.0): OImage(bitmap = bitmap, anchorX = anchorX, anchorY = anchorY) {
-    constructor(
-        bitmap: Bitmap,
-        anchorX: Double = 0.0,
-        anchorY: Double = 0.0,
-    ) : this(bitmap.slice(), anchorX, anchorY)
+class Ground(val layer: Layer,
+             info: TileInfo,
+             anchorX: Double = 0.0,
+             anchorY: Double=0.0)
+    : OImage(bitmap = BitmapDB.getBitmap(info.url),
+    anchorX = anchorX,
+    anchorY = anchorY) {
 
     override val type = TileType.GROUND
 
-
+    init {
+        x = 45.0*info.col
+        y = 45.0*info.row
+        layer[info.col, info.row] = this
+    }
 }
 
-inline fun Layer.ground(bitmap: Bitmap, callback: @ViewDslMarker Ground.() -> Unit = {}): Ground {
-    return Ground(bitmap).addTo(this, callback)
+inline fun Layer.ground(info: TileInfo, callback: @ViewDslMarker Ground.() -> Unit = {}): Ground {
+    return Ground(this, info).addTo(this, callback)
 }

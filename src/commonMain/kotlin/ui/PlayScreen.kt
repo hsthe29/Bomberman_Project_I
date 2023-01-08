@@ -1,6 +1,5 @@
 package ui
 
-import bitmapDB
 import com.soywiz.klock.*
 import com.soywiz.korev.*
 import com.soywiz.korge.animate.*
@@ -16,11 +15,10 @@ import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
 import entities.*
-import gameState
 import load.*
 import ui.level.*
 
-class PlayScreen(val isCheckPoint: Boolean, val tileLayer: List<TileLayer>): Scene() {
+class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
     private lateinit var world: World
     private lateinit var player: Player
     private lateinit var endGame: Container
@@ -31,17 +29,17 @@ class PlayScreen(val isCheckPoint: Boolean, val tileLayer: List<TileLayer>): Sce
     private lateinit var flameInfo: Pair<Image, Text>
 
     override suspend fun SContainer.sceneInit() {
-
+        val layerInfo = JsonTool.loadFromJson<Array<LayerInfo>>(info.mapURL, Array<LayerInfo>::class.java)
         world = world(this@PlayScreen) {
             y = 40.0
-            for(layer in tileLayer) {
+            for(layer in layerInfo) {
                 layer(layer.layerName, layer.tileInfo)
             }
 
             player = player {
                 anchor(0.5, 0.65)
                 scale(0.775)
-                xy(45*3 + 23, 45*8 + 15)
+                xy(45*3 + 22, 45*8 + 15)
             }
         }
         statusbar = container {
@@ -53,35 +51,35 @@ class PlayScreen(val isCheckPoint: Boolean, val tileLayer: List<TileLayer>): Sce
                 y = 5.0
             }
             hpInfo = Pair(
-                image(bitmapDB.getBitmap("items/heartfull.png")) {
+                image(resourcesVfs["items/heartfull.png"].readBitmap()) {
                     anchor(0.5, 0.5)
                     scale = 0.6
                     x = 1000.0 + 20.0
                     y = 30.0
                 },
-                text("x${player.getHP()}", font = plaguard, color = Colors.BLACK, textSize = 20.0) {
+                text("x${player.getHP()}", font = TextFont.plaguard, color = Colors.BLACK, textSize = 20.0) {
                     x = 1030.0 + 5.0
                     y = 25.0
                 })
             bombInfo = Pair(
-                image(bitmapDB.getBitmap("items/bomb.png")) {
+                image(resourcesVfs["items/bomb.png"].readBitmap()) {
                     anchor(0.5, 0.5)
                     scale = 0.7
                     x = 1080.0 + 20.0
                     y = 26.0
                 },
-                text("x${player.getMaxBomb()}", font = plaguard, color = Colors.BLACK, textSize = 20.0) {
+                text("x${player.getMaxBomb()}", font = TextFont.plaguard, color = Colors.BLACK, textSize = 20.0) {
                     x = 1110.0 + 5.0
                     y = 25.0
                 })
             flameInfo = Pair(
-                image(bitmapDB.getBitmap("items/flame.png")) {
+                image(resourcesVfs["items/flame.png"].readBitmap()) {
                     anchor(0.5, 0.5)
                     scale = 0.8
                     x = 1160.0 + 20.0
                     y = 26.0
                 },
-                text("x${player.getBlastRange()}", font = plaguard, color = Colors.BLACK, textSize = 20.0) {
+                text("x${player.getBlastRange()}", font = TextFont.plaguard, color = Colors.BLACK, textSize = 20.0) {
                     x = 1190.0 + 5.0
                     y = 25.0
                 })
@@ -150,18 +148,22 @@ class PlayScreen(val isCheckPoint: Boolean, val tileLayer: List<TileLayer>): Sce
                 x = 700.0
                 y = 400.0
             }
-            uiButton("EXIT") {
-                x = 800.0
+            image(resourcesVfs["icons/exit-game.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                scale(0.2)
+                x = 900.0 + width*0.5*scale
                 y = 600.0
                 onClick {
-                    sceneContainer.changeTo({ Lobby(gameState.map) })
+                    sceneContainer.changeTo({ Lobby(GameState.map) })
                 }
             }
-            uiButton("REPLAY") {
-                x = 600.0 - width
+            image(resourcesVfs["icons/replay-game.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                scale(0.2)
+                x = 500.0 - width*0.5*scale
                 y = 600.0
                 onClick {
-                    sceneContainer.changeTo({ PlayScreen(isCheckPoint, getTileMap("databases/stage-${gameState.map}_level-${gameState.level}.json").data) })
+                    sceneContainer.changeTo({ PlayScreen(level, info) })
                 }
             }
             show(0.8.seconds, Easing.EASE_IN)
@@ -169,54 +171,43 @@ class PlayScreen(val isCheckPoint: Boolean, val tileLayer: List<TileLayer>): Sce
     }
 
     suspend fun showGameWin() {
-        if(isCheckPoint) {
-            gameState.map++
-            gameState.level = 0
-        } else gameState.level++
+        updateGameState()
         receiveKeyInput = false
         world.colorMul = Colors["#7a7a7a"]
         statusbar.colorMul = Colors["#7a7a7a"]
         with(endGame) {
             image(resourcesVfs["items/won_base.png"].readBitmap()) {
                 anchor(0.5, 0.5)
-                x = 700.0
-                y = 400.0
+                xy(700.0,400.0)
             }
-            if(isCheckPoint) {
-                uiButton("GO") {
-                    x = 700.0 - width*0.5
-                    y = 600.0
-                    onClick {
-                        sceneContainer.changeTo({ Lobby(gameState.map) })
-                    }
+            image(resourcesVfs["icons/exit-game.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                scale(0.2)
+                x = 900.0 + width*0.5*scale
+                y = 600.0
+                onClick {
+                    sceneContainer.changeTo({ Lobby(GameState.map) })
                 }
             }
-            else {
-                uiButton("EXIT") {
-                    x = 800.0
-                    y = 600.0
-                    onClick {
-                        sceneContainer.changeTo({ Lobby(gameState.map) })
-                    }
-                }
-                uiButton("NEXT") {
-                    x = 600.0 - width
-                    y = 600.0
-                    onClick {
-                        sceneContainer.changeTo({
-                            PlayScreen(
-                                gameState.position[gameState.map]!![gameState.level].checkpoint,
-                                getTileMap("databases/stage-${gameState.map}_level-${gameState.level}.json").data
-                            )
-                        })
-                    }
+            image(resourcesVfs["icons/next-game.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                scale(0.2)
+                x = 500.0 - width*0.5*scale
+                y = 600.0
+                onClick {
+                    sceneContainer.changeTo({ PlayScreen(level, info) })
                 }
             }
             show(0.8.seconds, Easing.EASE_IN)
         }
     }
 
-    fun updateGameState() {
-
+    private fun updateGameState() {
+        info.passed = true
+        info.entryURL = info.entryURL.replace(".png", "_passed.png")
+        if(info.checkpoint) {
+            GameState.map++
+            GameState.level = 0
+        } else GameState.level++
     }
 }

@@ -1,28 +1,26 @@
 package ui.component
 
+import com.soywiz.korge.input.*
 import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.*
-import com.soywiz.korio.resources.*
 import core.base.*
 import load.*
+import ui.*
 
-class Entry(val level: Int, bitmap: Resourceable<out BaseBmpSlice>,
-            anchorX: Double = 0.5,
-            anchorY: Double=0.5,
-            val isCheckPoint: Boolean = false
-            ): OImage(bitmap = bitmap, anchorX = anchorX, anchorY = anchorY) {
-    constructor(
-        level: Int,
-        passed: Boolean,
-        bitmap: Bitmap,
-        isCheckPoint: Boolean = false
-    ) : this(level, bitmap.slice(), isCheckPoint = isCheckPoint) {
-        this.passed = passed
+class Entry(private val game: Lobby, val level: Int, val info: EntryInfo)
+    : OImage(bitmap = BitmapDB.getBitmap(info.entryURL), anchorX = 0.5, anchorY = 0.5) {
+    init {
+        position(info.x, info.y)
+        onClick {
+            if (GameState.map >= game.map && level <= GameState.level) {
+                game.sceneContainer.changeTo({
+                    PlayScreen(level, info)
+                })
+            } else { game.notifyMessage("You have to complete previous level first!") }
+        }
     }
 
-    var passed = false
 }
 
-inline fun Container.entry(level: Int, passed: Boolean, isCheckPoint: Boolean, bitmap: Bitmap, callback: @ViewDslMarker Entry.() -> Unit = {}): Entry {
-    return Entry(level, passed, bitmap, isCheckPoint).addTo(this, callback)
+inline fun Container.entry(game: Lobby, level: Int, info: EntryInfo, callback: @ViewDslMarker Entry.() -> Unit = {}): Entry {
+    return Entry(game, level, info).addTo(this, callback)
 }

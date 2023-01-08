@@ -1,25 +1,26 @@
 package entities.tiles
 
 import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.*
-import com.soywiz.korio.resources.*
 import core.base.*
 import load.*
 import ui.level.*
 
-class HitPoint(bitmap: Resourceable<out BaseBmpSlice>,
-            anchorX: Double = 0.5,
-            anchorY: Double=0.5): OImage(bitmap = bitmap, anchorX = anchorX, anchorY = anchorY) {
-    constructor(
-        bitmap: Bitmap,
-        anchorX: Double = 0.5,
-        anchorY: Double = 0.5,
-    ) : this(bitmap.slice(), anchorX, anchorY)
+class HitPoint(val layer: Layer,
+               info: TileInfo,
+               anchorX: Double = 0.5,
+               anchorY: Double=0.5)
+    : OImage(bitmap = BitmapDB.getBitmap(info.url), anchorX = anchorX, anchorY = anchorY) {
+
     override val type = TileType.HEALTH
 
+    init {
+        x = 45.0*info.col + 23.0
+        y = 45.0*info.row + 23.0
+        layer[info.col, info.row] = this
+    }
 
 }
 
-inline fun Layer.hitpoint(bitmap: Bitmap, callback: @ViewDslMarker HitPoint.() -> Unit = {}): HitPoint {
-    return HitPoint(bitmap).addTo(this, callback)
+inline fun Layer.hitpoint(info: TileInfo, callback: @ViewDslMarker HitPoint.() -> Unit = {}): HitPoint {
+    return HitPoint(this, info).addTo(this, callback)
 }

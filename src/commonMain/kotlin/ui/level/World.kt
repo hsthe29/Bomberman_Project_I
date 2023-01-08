@@ -1,8 +1,8 @@
 package ui.level
 
 import com.soywiz.korge.view.*
-import com.soywiz.korge.view.filter.*
 import core.base.*
+import entities.*
 import entities.tiles.*
 import load.*
 import ui.*
@@ -57,6 +57,12 @@ class World(val screen: PlayScreen): Container() {
             }
         }
         return tiles
+    }
+
+    suspend fun putBombAt(player: Player, col: Int, row: Int) {
+        putLayer.bomb(col, row) {
+            ticking(player)
+        }
     }
 
     suspend fun notifyGameOver() {

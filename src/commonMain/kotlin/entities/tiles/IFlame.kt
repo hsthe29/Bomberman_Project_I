@@ -1,26 +1,26 @@
 package entities.tiles
 
 import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.*
-import com.soywiz.korio.resources.*
 import core.base.*
 import load.*
 import ui.level.*
 
-class IFlame(bitmap: Resourceable<out BaseBmpSlice>,
-           anchorX: Double = 0.5,
-           anchorY: Double=0.5): OImage(bitmap = bitmap, anchorX = anchorX, anchorY = anchorY) {
-    constructor(
-        bitmap: Bitmap,
-        anchorX: Double = 0.5,
-        anchorY: Double = 0.5,
-    ) : this(bitmap.slice(), anchorX, anchorY)
-    var isOpened = false
+class IFlame(val layer: Layer,
+             info: TileInfo,
+             anchorX: Double = 0.5,
+             anchorY: Double=0.5)
+    : OImage(bitmap = BitmapDB.getBitmap(info.url), anchorX = anchorX, anchorY = anchorY) {
+
     override val type = TileType.FLAME
 
+    init {
+        x = 45.0*info.col + 22.0
+        y = 45.0*info.row + 22.0
+        layer[info.col, info.row] = this
+    }
 
 }
 
-inline fun Layer.iflame(bitmap: Bitmap, callback: @ViewDslMarker IFlame.() -> Unit = {}): IFlame {
-    return IFlame(bitmap).addTo(this, callback)
+inline fun Layer.iflame(info: TileInfo, callback: @ViewDslMarker IFlame.() -> Unit = {}): IFlame {
+    return IFlame(this, info).addTo(this, callback)
 }

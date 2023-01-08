@@ -15,3 +15,9 @@ fun distLessThan(x1: Double, y1: Double, x2: Double, y2: Double, offset: Double)
     val ans = t1*t1 + t2*t2
     return ans < offset*offset
 }
+
+fun withinSquare(playerPos: Pair<Double, Double>, itemPos: Pair<Double, Double>)
+    = playerPos.first > itemPos.first - 23.0
+        && playerPos.first < itemPos.first+23.0
+        && playerPos.second > itemPos.second-23.0
+        && playerPos.second < itemPos.second+23.0

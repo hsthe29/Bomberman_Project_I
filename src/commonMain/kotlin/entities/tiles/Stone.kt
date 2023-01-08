@@ -1,26 +1,25 @@
 package entities.tiles
 
 import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.*
-import com.soywiz.korio.resources.*
 import core.base.*
 import load.*
 import ui.level.*
 
-class Stone(bitmap: Resourceable<out BaseBmpSlice>,
-           anchorX: Double = 0.0,
-           anchorY: Double=0.0): OImage(bitmap = bitmap, anchorX = anchorX, anchorY = anchorY) {
-    constructor(
-        bitmap: Bitmap,
-        anchorX: Double = 0.0,
-        anchorY: Double = 0.0,
-    ) : this(bitmap.slice(), anchorX, anchorY)
+class Stone(val layer: Layer,
+            info: TileInfo,
+            anchorX: Double = 0.0,
+            anchorY: Double=0.0)
+    : OImage(bitmap = BitmapDB.getBitmap(info.url), anchorX = anchorX, anchorY = anchorY) {
 
     override val type = TileType.STONE
-
+    init {
+        x = 45.0*info.col
+        y = 45.0*info.row
+        layer[info.col, info.row] = this
+    }
 
 }
 
-inline fun Layer.stone(bitmap: Bitmap, callback: @ViewDslMarker Stone.() -> Unit = {}): Stone {
-    return Stone(bitmap).addTo(this, callback)
+inline fun Layer.stone(info: TileInfo, callback: @ViewDslMarker Stone.() -> Unit = {}): Stone {
+    return Stone(this, info).addTo(this, callback)
 }
