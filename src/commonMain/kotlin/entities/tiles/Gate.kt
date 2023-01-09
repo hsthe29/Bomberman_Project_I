@@ -17,10 +17,10 @@ class Gate(val layer: Layer, info: TileInfo, anchorX: Double = 0.5,
     override val type = TileType.GATE
 
     init {
-        x = 45.0*info.col + 22.0
-        y = 45.0*info.row + 22.0
         layer[info.col, info.row] = this
         layer.world.gate = this
+        x = 45.0*info.col + 22.0
+        y = 45.0*info.row + 22.0
     }
 
     fun open() {
@@ -29,5 +29,5 @@ class Gate(val layer: Layer, info: TileInfo, anchorX: Double = 0.5,
 }
 
 inline fun Layer.gate(info: TileInfo, callback: @ViewDslMarker Gate.() -> Unit = {}): Gate {
-    return Gate(this, info).addTo(this, callback)
+    return Gate(this, info).apply(callback)
 }

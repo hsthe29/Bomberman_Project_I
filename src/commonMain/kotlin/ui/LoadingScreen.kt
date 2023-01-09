@@ -22,8 +22,7 @@ class LoadingScreen : Scene() {
     override suspend fun SContainer.sceneMain() {
         val background = image(resourcesVfs["backgrounds/loading_bg.png"].readBitmap()) {
             anchor(0.5, 0.5)
-            scale(0.9)
-            position(650, 400)
+            xy(700.0, 400.0)
         }
         val logo = image(resourcesVfs["logo.png"].readBitmap()) {
             anchor(.5, .5)
@@ -120,15 +119,14 @@ class LoadingScreen : Scene() {
                 }
                 image(closeDark) {
                     anchor(0.5, 0.5)
-                    scale(0.1)
                     position(250, -200)
                     mouse {
                         onOver {
-                            scale = 0.12
+                            scale = 1.2
                             bitmap = closeLight.slice()
                         }
                         onOut {
-                            scale = 0.1
+                            scale = 1.0
                             bitmap = closeDark.slice()
                         }
                     }
@@ -177,10 +175,11 @@ class LoadingScreen : Scene() {
             settings.show(0.5.seconds)
             exit.show(0.5.seconds)
         }
+        tween(background::x[700, 800], time = 10.seconds, easing = Easing.EASE_IN_OUT)
         animateParallel {
             sequence(looped = true) {
-                tween(background::x[650, 750], time = 10.seconds, easing = Easing.EASE_IN_OUT)
-                tween(background::x[750, 650], time = 10.seconds, easing = Easing.EASE_IN_OUT)
+                tween(background::x[800, 600], time = 20.seconds, easing = Easing.EASE_IN_OUT)
+                tween(background::x[600, 800], time = 20.seconds, easing = Easing.EASE_IN_OUT)
             }
         }
     }

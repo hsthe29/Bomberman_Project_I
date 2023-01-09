@@ -13,13 +13,13 @@ class Stone(val layer: Layer,
 
     override val type = TileType.STONE
     init {
+        layer[info.col, info.row] = this
         x = 45.0*info.col
         y = 45.0*info.row
-        layer[info.col, info.row] = this
     }
 
 }
 
 inline fun Layer.stone(info: TileInfo, callback: @ViewDslMarker Stone.() -> Unit = {}): Stone {
-    return Stone(this, info).addTo(this, callback)
+    return Stone(this, info).apply(callback)
 }

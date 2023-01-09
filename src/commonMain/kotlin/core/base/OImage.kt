@@ -77,7 +77,6 @@ open class OImage(
 
 }
 
-
 inline fun Layer.tile(bitmap: Bitmap, callback: @ViewDslMarker OImage.() -> Unit = {}): OImage {
     return OImage(bitmap).addTo(this, callback)
 }

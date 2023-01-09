@@ -14,13 +14,13 @@ class HitPoint(val layer: Layer,
     override val type = TileType.HEALTH
 
     init {
+        layer[info.col, info.row] = this
         x = 45.0*info.col + 23.0
         y = 45.0*info.row + 23.0
-        layer[info.col, info.row] = this
     }
 
 }
 
 inline fun Layer.hitpoint(info: TileInfo, callback: @ViewDslMarker HitPoint.() -> Unit = {}): HitPoint {
-    return HitPoint(this, info).addTo(this, callback)
+    return HitPoint(this, info).apply(callback)
 }

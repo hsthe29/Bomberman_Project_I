@@ -14,13 +14,13 @@ class IFlame(val layer: Layer,
     override val type = TileType.FLAME
 
     init {
+        layer[info.col, info.row] = this
         x = 45.0*info.col + 22.0
         y = 45.0*info.row + 22.0
-        layer[info.col, info.row] = this
     }
 
 }
 
 inline fun Layer.iflame(info: TileInfo, callback: @ViewDslMarker IFlame.() -> Unit = {}): IFlame {
-    return IFlame(this, info).addTo(this, callback)
+    return IFlame(this, info).apply(callback)
 }

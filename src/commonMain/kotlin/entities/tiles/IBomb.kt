@@ -14,13 +14,13 @@ class IBomb(val layer: Layer,
     override val type = TileType.BOMB_INCR
 
     init {
+        layer[info.col, info.row] = this
         x = 45.0*info.col + 22.0
         y = 45.0*info.row + 22.0
-        layer[info.col, info.row] = this
     }
 
 }
 
 inline fun Layer.ibomb(info: TileInfo, callback: @ViewDslMarker IBomb.() -> Unit = {}): IBomb {
-    return IBomb(this, info).addTo(this, callback)
+    return IBomb(this, info).apply(callback)
 }

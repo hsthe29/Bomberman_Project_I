@@ -31,8 +31,14 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
     }
 
     operator fun set(col: Int, row: Int, value: Tile?) {
+        if(value != null) {
+            value.addTo(this)
+            positions.add(Pair(col, row))
+        } else {
+            data[col][row]?.removeFromParent()
+            positions.removeIf { it.first == col && it.second == row}
+        }
         data[col][row] = value
-        positions.add(Pair(col, row))
     }
 
     fun allTiles(): List<Tile> {
@@ -41,17 +47,5 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
 
     fun occupied(col: Int, row: Int): Boolean {
         return data[col][row] != null
-    }
-
-    fun addTile(col: Int, row: Int, tile: Tile) {
-        tile.addTo(this)
-        data[col][row] = tile
-        positions.add(Pair(col, row))
-    }
-
-    fun removeTile(col: Int, row: Int) {
-        data[col][row]?.removeFromParent()
-        data[col][row] = null
-        positions.removeIf { it.first == col && it.second == row}
     }
 }

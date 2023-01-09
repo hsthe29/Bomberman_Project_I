@@ -7,11 +7,13 @@ import com.soywiz.korge.view.*
 import com.soywiz.korge.view.Sprite
 import com.soywiz.korim.bitmap.*
 import com.soywiz.korim.format.*
+import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
 import core.base.*
 import core.physics.*
 import load.*
 import ui.level.*
+import kotlin.coroutines.*
 
 data class PlayerAnimation(
     val spriteAnimationLeft: SpriteAnimation,
@@ -20,7 +22,7 @@ data class PlayerAnimation(
     val spriteAnimationDown: SpriteAnimation
 )
 
-data class Backpack(var hp: Int = 300, var speed: Double = 2.0, var maxBomb: Int = 5, var bombCount: Int = 0, var blastRange: Int = 2, var damage: Int = 1)
+data class Backpack(var hp: Int = 3, var speed: Double = 1.1, var maxBomb: Int = 1, var bombCount: Int = 0, var blastRange: Int = 2, var damage: Int = 1)
 
 suspend inline fun World.player(callback: @ViewDslMarker Player.() -> Unit = {}): Player {
     val spriteMap = resourcesVfs["player-skin.png"].readBitmap()
@@ -81,17 +83,13 @@ class Player(
     /** Allows to know the appropriate moment to stop the movement animation. */
     private val backpack = Backpack()
 
-    fun getHP(): Int {
-        return backpack.hp
-    }
+    fun getHP() = backpack.hp
 
-    fun getMaxBomb(): Int {
-        return backpack.maxBomb
-    }
+    fun getMaxBomb() = backpack.maxBomb
 
-    fun getBlastRange(): Int {
-        return backpack.blastRange
-    }
+    fun getBlastRange() =  backpack.blastRange
+
+    fun getDamage() = backpack.damage
 
     fun collidesWith(x: Double, y: Double, other: OImage): Boolean {
         val center = Pair(x, y)
@@ -167,8 +165,7 @@ class Player(
         }
         if(!anyMovement)
             stopAnimation()
-
-        takeItem()
+        launch(coroutineContext) { takeItem() }
     }
 
     private suspend fun takeItem() {
@@ -177,16 +174,19 @@ class Player(
             if(distLessThan(x, y, item.x, item.y, 20.0)) {
                 when(item.type) {
                     TileType.BOMB_INCR -> {
-                        backpack.maxBomb++
-                        world.screen.setMaxBomb(backpack.maxBomb)
+//                        backpack.maxBomb++
+                        world.screen.setMaxBomb(++backpack.maxBomb)
                     }
                     TileType.HEALTH -> {
-                        backpack.hp++
-                        world.screen.setHP(backpack.hp)
+//                        backpack.hp++
+                        world.screen.setHP(++backpack.hp)
                     }
                     TileType.FLAME -> {
-                        backpack.blastRange++
-                        world.screen.setBlastRange(backpack.blastRange)
+//                        backpack.blastRange++
+                        world.screen.setBlastRange(++backpack.blastRange)
+                    }
+                    TileType.ATTACK -> {
+                        world.screen.setDamage(++backpack.damage)
                     }
                     TileType.KEY -> {
                         world.gate?.isOpened = true
@@ -200,7 +200,7 @@ class Player(
                     else -> {}
                 }
                 if(item.type != TileType.GATE)
-                    world.getLayer("item").removeTile(col = (item.x/45.0).toInt(), row = (item.y/45.0).toInt())
+                    world.getLayer("item")[(item.x/45.0).toInt(), (item.y/45.0).toInt()] = null
                 break
             }
         }

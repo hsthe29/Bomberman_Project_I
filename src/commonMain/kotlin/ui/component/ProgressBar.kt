@@ -17,8 +17,6 @@ class ProgressBar(width: Double, height: Double, baseColor: RGBA, sliderColor: R
         windowBounds.height = height
     }
 
-
-
     /** This method plot Progress Bar with anchor = 0.5 */
     fun plotOn(x: Double, y: Double) {
         this.x = x - width*0.5

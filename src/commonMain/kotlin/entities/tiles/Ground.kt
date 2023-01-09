@@ -16,12 +16,12 @@ class Ground(val layer: Layer,
     override val type = TileType.GROUND
 
     init {
+        layer[info.col, info.row] = this
         x = 45.0*info.col
         y = 45.0*info.row
-        layer[info.col, info.row] = this
     }
 }
 
 inline fun Layer.ground(info: TileInfo, callback: @ViewDslMarker Ground.() -> Unit = {}): Ground {
-    return Ground(this, info).addTo(this, callback)
+    return Ground(this, info).apply(callback)
 }

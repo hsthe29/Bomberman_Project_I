@@ -14,13 +14,13 @@ class Key(val layer: Layer,
     override val type = TileType.KEY
 
     init {
+        layer[info.col, info.row] = this
         x = 45.0*info.col + 22.0
         y = 45.0*info.row + 22.0
-        layer[info.col, info.row] = this
     }
 
 }
 
 inline fun Layer.key(info: TileInfo, callback: @ViewDslMarker Key.() -> Unit = {}): Key {
-    return Key(this, info).addTo(this, callback)
+    return Key(this, info).apply(callback)
 }

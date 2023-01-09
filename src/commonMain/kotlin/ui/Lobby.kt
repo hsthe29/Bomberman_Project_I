@@ -21,18 +21,14 @@ class Lobby(val map: Int):Scene() {
     private lateinit var background: Container
     private lateinit var nextMap: Image
 
-    init {
-
-    }
     override suspend fun SContainer.sceneInit() {
         background = container {
-            image(BitmapDB.getBitmap("backgrounds/map_process_${map}.png")) {
+            image(resourcesVfs["backgrounds/map_process_${map}.png"].readBitmap()) {
                 anchor(.5, .5)
                 scale(1.0)
-                position(700, 400)
+                xy(700.0, 400.0)
             }
             val position = GameState.mapOf(map)
-
             position.fastForEachWithIndex { id, value ->
                 entry(this@Lobby, id, value) {
                     scale(0.3)
@@ -42,7 +38,7 @@ class Lobby(val map: Int):Scene() {
                     }
                 }
             }
-            nextMap = image(BitmapDB.getBitmap("icons/nv-button-${map}.png")) {
+            nextMap = image(resourcesVfs["icons/nv-button-${map}.png"].readBitmap()) {
                 alpha = 0.7
                 anchor(0.5, 0.5)
                 scale(0.2)
@@ -59,21 +55,20 @@ class Lobby(val map: Int):Scene() {
                 }
             }
             container {
-                roundRect(60, 60, 10, fill = Colors.WHITE) {
+                circle(25.0,  fill = Colors.WHITE) {
                     anchor(0.5, 0.5)
                     xy(1360.0, 40.0)
                 }
                 image(BitmapDB.getBitmap("icons/cancel-dark.png")) {
                     anchor(0.5, 0.5)
-                    scale(0.1)
                     position(1360, 40)
                     mouse {
                         onOver {
-                            scale = 0.12
+                            scale = 1.2
                             bitmap = BitmapDB.getBitmap("icons/cancel-light.png").slice()
                         }
                         onOut {
-                            scale = 0.1
+                            scale = 1.0
                             bitmap = BitmapDB.getBitmap("icons/cancel-dark.png").slice()
                         }
                     }
@@ -118,8 +113,8 @@ class Lobby(val map: Int):Scene() {
                 y = 50.0 - 0.5 * height
             }
             animateParallel {
-                tween(back::y[40.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)
-                tween(front::y[40.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)
+                tween(back::y[40.0], time = 1.seconds, easing = Easing.EASE_IN_OUT)
+                tween(front::y[40.0], time = 1.seconds, easing = Easing.EASE_IN_OUT)
             }
             animateParallel {
                 tween(back::y[40.0, -30.0], time = 0.8.seconds, easing = Easing.EASE_IN_OUT)

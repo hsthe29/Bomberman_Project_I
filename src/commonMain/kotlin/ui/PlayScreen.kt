@@ -27,6 +27,8 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
     private lateinit var hpInfo: Pair<Image, Text>
     private lateinit var bombInfo: Pair<Image, Text>
     private lateinit var flameInfo: Pair<Image, Text>
+    private lateinit var attackInfo: Pair<Image, Text>
+    private lateinit var pause: Image
 
     override suspend fun SContainer.sceneInit() {
         val layerInfo = JsonTool.loadFromJson<Array<LayerInfo>>(info.mapURL, Array<LayerInfo>::class.java)
@@ -46,13 +48,12 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
             image(resourcesVfs["items/status_bg.png"].readBitmap()) {
                 y = -25.0
             }
-            roundRect(350, 50, 5, fill = Colors.WHITE) {
+            roundRect(355, 50, 5, fill = Colors.WHITE) {
                 x = 1000.0
                 y = 5.0
             }
             hpInfo = Pair(
-                image(resourcesVfs["items/heartfull.png"].readBitmap()) {
-                    anchor(0.5, 0.5)
+                image(resourcesVfs["items/heartfull.png"].readBitmap(), 0.5, 0.5) {
                     scale = 0.6
                     x = 1000.0 + 20.0
                     y = 30.0
@@ -62,27 +63,46 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
                     y = 25.0
                 })
             bombInfo = Pair(
-                image(resourcesVfs["items/bomb.png"].readBitmap()) {
-                    anchor(0.5, 0.5)
-                    scale = 0.7
+                image(resourcesVfs["items/bomb.png"].readBitmap(), 0.5, 0.5) {
+                    scale = 0.6
                     x = 1080.0 + 20.0
-                    y = 26.0
+                    y = 30.0
                 },
                 text("x${player.getMaxBomb()}", font = TextFont.plaguard, color = Colors.BLACK, textSize = 20.0) {
                     x = 1110.0 + 5.0
                     y = 25.0
                 })
             flameInfo = Pair(
-                image(resourcesVfs["items/flame.png"].readBitmap()) {
-                    anchor(0.5, 0.5)
-                    scale = 0.8
+                image(resourcesVfs["items/flame.png"].readBitmap(), 0.5, 0.5) {
+                    scale = 0.7
                     x = 1160.0 + 20.0
-                    y = 26.0
+                    y = 30.0
                 },
                 text("x${player.getBlastRange()}", font = TextFont.plaguard, color = Colors.BLACK, textSize = 20.0) {
                     x = 1190.0 + 5.0
                     y = 25.0
                 })
+            attackInfo = Pair(
+                image(resourcesVfs["items/sword.png"].readBitmap(), 0.5, 0.5) {
+                    scale = 0.6
+                    x = 1240.0 + 20.0
+                    y = 30.0
+                },
+                text("x${player.getDamage()}", font = TextFont.plaguard, color = Colors.BLACK, textSize = 20.0) {
+                    x = 1270.0 + 5.0
+                    y = 25.0
+                })
+            pause = image(resourcesVfs["icons/pause-button.png"].readBitmap(), 0.5, 0.5) {
+                scale = 0.4
+                x = 1330.0
+                y = 30.0
+                onClick {
+                    if(receiveKeyInput) {
+                        bitmap = resourcesVfs["icons/play-button.png"].readBitmapSlice()
+                        showGamePaused()
+                    }
+                }
+            }
         }
 
         endGame = container {
@@ -94,7 +114,7 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
                 launch { player.update(input) }
                 if (input.keys[Key.LEFT]) if (x < 0.0) x++
                 if (input.keys[Key.RIGHT]) if (x > -265.0) x--
-                if (input.keys.justPressed(Key.SPACE)) {
+                if (input.keys[Key.SPACE]) {
                     launch { player.putBomb() }
                 }
             }
@@ -115,8 +135,8 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
     fun setHP(value: Int) {
         val img = hpInfo.first
         launch {
-            img.tween(img::scale[0.6, 0.7], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
-            img.tween(img::scale[0.7, 0.6], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.6, 0.75], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.75, 0.6], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
         }
         hpInfo.second.text = "x$value"
     }
@@ -124,8 +144,8 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
     fun setMaxBomb(value: Int) {
         val img = bombInfo.first
         launch {
-            img.tween(img::scale[0.7, 0.8], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
-            img.tween(img::scale[0.8, 0.7], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.6, 0.75], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.75, 0.6], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
         }
         bombInfo.second.text = "x$value"
     }
@@ -133,15 +153,35 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
     fun setBlastRange(value: Int) {
         val img = flameInfo.first
         launch {
-            img.tween(img::scale[0.8, 0.9], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
-            img.tween(img::scale[0.9, 0.8], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.7, 0.85], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.85, 0.7], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
         }
         flameInfo.second.text = "x$value"
     }
-    suspend fun showGameOver() {
+
+    fun setDamage(value: Int) {
+        val img = attackInfo.first
+        launch {
+            img.tween(img::scale[0.6, 0.75], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+            img.tween(img::scale[0.75, 0.6], time = 0.3.seconds, easing = Easing.EASE_IN_OUT)
+        }
+        attackInfo.second.text = "x$value"
+    }
+
+    private fun preShow() {
         receiveKeyInput = false
         world.colorMul = Colors["#7a7a7a"]
         statusbar.colorMul = Colors["#7a7a7a"]
+
+    }
+    private fun endShow() {
+        receiveKeyInput = false
+        world.colorMul = Colors["#ffffff"]
+        statusbar.colorMul = Colors["#ffffff"]
+
+    }
+    suspend fun showGameOver() {
+        preShow()
         with(endGame) {
             image(resourcesVfs["items/defeated_base.png"].readBitmap()) {
                 anchor(0.5, 0.5)
@@ -153,18 +193,14 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
                 scale(0.2)
                 x = 900.0 + width*0.5*scale
                 y = 600.0
-                onClick {
-                    sceneContainer.changeTo({ Lobby(GameState.map) })
-                }
+                onClick { sceneContainer.changeTo({ Lobby(GameState.map) }) }
             }
             image(resourcesVfs["icons/replay-game.png"].readBitmap()) {
                 anchor(0.5, 0.5)
                 scale(0.2)
                 x = 500.0 - width*0.5*scale
                 y = 600.0
-                onClick {
-                    sceneContainer.changeTo({ PlayScreen(level, info) })
-                }
+                onClick { sceneContainer.changeTo({ PlayScreen(level, info) }) }
             }
             show(0.8.seconds, Easing.EASE_IN)
         }
@@ -172,9 +208,7 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
 
     suspend fun showGameWin() {
         updateGameState()
-        receiveKeyInput = false
-        world.colorMul = Colors["#7a7a7a"]
-        statusbar.colorMul = Colors["#7a7a7a"]
+        preShow()
         with(endGame) {
             image(resourcesVfs["items/won_base.png"].readBitmap()) {
                 anchor(0.5, 0.5)
@@ -196,6 +230,38 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
                 y = 600.0
                 onClick {
                     sceneContainer.changeTo({ PlayScreen(level, info) })
+                }
+            }
+            show(0.8.seconds, Easing.EASE_IN)
+        }
+    }
+
+    suspend fun showGamePaused() {
+        preShow()
+        with(endGame) {
+            image(resourcesVfs["items/won_base.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                xy(700.0,400.0)
+            }
+            image(resourcesVfs["icons/exit-game.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                scale(0.2)
+                x = 900.0 + width*0.5*scale
+                y = 600.0
+                onClick {
+                    sceneContainer.changeTo({ Lobby(GameState.map) })
+                }
+            }
+            image(resourcesVfs["icons/resume-game.png"].readBitmap()) {
+                anchor(0.5, 0.5)
+                scale(0.2)
+                x = 500.0 - width*0.5*scale
+                y = 600.0
+                onClick {
+                    pause.bitmap = resourcesVfs["icons/pause-button.png"].readBitmapSlice()
+                    this@with.hide(time=0.3.seconds, easing = Easing.EASE_OUT)
+                    endShow()
+                    receiveKeyInput = true
                 }
             }
             show(0.8.seconds, Easing.EASE_IN)

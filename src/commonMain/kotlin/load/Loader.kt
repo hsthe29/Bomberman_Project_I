@@ -1,17 +1,12 @@
 package load
 
-//object GameState
 val urls = arrayOf(
-        "backgrounds/map_process_0.png",
-        "backgrounds/map_process_1.png",
         "icons/exit-button-colored.png",
         "icons/exit-button.png",
         "icons/start-button-colored.png",
         "icons/start-button.png",
         "icons/settings-button-colored.png",
         "icons/settings-button.png",
-        "icons/nv-button-1.png",
-        "icons/nv-button-0.png",
         "icons/cancel-dark.png",
         "icons/cancel-light.png",
         "tiles/dark-floor-1.png",
