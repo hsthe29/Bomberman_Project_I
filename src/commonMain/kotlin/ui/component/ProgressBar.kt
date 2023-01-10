@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 
 class ProgressBar(width: Double, height: Double, baseColor: RGBA, sliderColor: RGBA): Container() {
     private val background = roundRect(width, height, 10.0, 10.0, fill = baseColor)
-    private val slider = roundRect(5.0, height, 10.0, 10.0, fill = sliderColor)
+    private val slider = roundRect(10.0, height, 10.0, 10.0, fill = sliderColor)
     private var loader: Deferred<Unit>? = null
     private var progress: Deferred<Unit>? = null
     init {

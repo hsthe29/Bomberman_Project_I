@@ -5,6 +5,7 @@ import core.base.*
 import core.base.OImage as Tile
 import entities.tiles.*
 import load.*
+import java.lang.Exception
 
 class Layer(var world: World, val layerName:String = "object", tiles: List<TileInfo> = listOf()): Container() {
     private val positions = mutableListOf<Pair<Int, Int>>()
@@ -21,7 +22,10 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
                 TileType.BRICK -> brick(it)
                 TileType.STONE -> stone(it)
                 TileType.GROUND -> ground(it)
-                else -> tile(BitmapDB.getBitmap(it.url))
+                TileType.SPEEDUP -> speed(it)
+                else -> {
+                    println("default")
+                }
             }
         }
     }

@@ -69,7 +69,7 @@ class LoadingScreen : Scene() {
                 }
             }
             onClick {
-                sceneContainer.changeTo({ Lobby(GameState.map) }) }
+                sceneContainer.changeTo({ Lobby(GameState.nextEntryLevel.first) }) }
         }
         val settings = image(BitmapDB.getBitmap("icons/settings-button.png")) {
             anchor(0.5, 0.5)

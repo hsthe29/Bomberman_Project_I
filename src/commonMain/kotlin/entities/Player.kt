@@ -1,19 +1,24 @@
 package entities
 
 import com.soywiz.kds.iterators.*
+import com.soywiz.klock.*
 import com.soywiz.korev.Key
 import com.soywiz.korge.input.*
+import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korge.view.Sprite
 import com.soywiz.korim.bitmap.*
+import com.soywiz.korim.color.*
 import com.soywiz.korim.format.*
 import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
+import com.soywiz.korma.interpolation.*
 import core.base.*
 import core.physics.*
 import load.*
 import ui.level.*
 import kotlin.coroutines.*
+import kotlin.math.*
 
 data class PlayerAnimation(
     val spriteAnimationLeft: SpriteAnimation,
@@ -26,8 +31,7 @@ data class Backpack(var hp: Int = 3, var speed: Double = 1.1, var maxBomb: Int =
 
 suspend inline fun World.player(callback: @ViewDslMarker Player.() -> Unit = {}): Player {
     val spriteMap = resourcesVfs["player-skin.png"].readBitmap()
-    return Player(this, Player.animations(spriteMap)/*, upKey = Key.W, downKey = Key.S, leftKey = Key.A, rightKey = Key.D*/)
-        .addTo(this, callback)
+    return Player(this, Player.animations(spriteMap)).addTo(this, callback)
 }
 
 class Player(
@@ -96,8 +100,8 @@ class Player(
         val radius = 14.0
         val bottomRight = Pair(other.x+45.0, other.y+45.0)
         val upperLeft = Pair(other.x, other.y)
-        val Xn = java.lang.Double.max(upperLeft.first, java.lang.Double.min(center.first, bottomRight.first))
-        val Yn = java.lang.Double.max(upperLeft.second, java.lang.Double.min(center.second, bottomRight.second))
+        val Xn = max(upperLeft.first, min(center.first, bottomRight.first))
+        val Yn = max(upperLeft.second, min(center.second, bottomRight.second))
         val Dx = Xn - center.first
         val Dy = Yn - center.second
         return (Dx * Dx + Dy * Dy) <= radius*radius
@@ -108,9 +112,7 @@ class Player(
         return false
     }
 
-    fun releaseBomb() {
-        backpack.bombCount--
-    }
+    fun releaseBomb() { backpack.bombCount-- }
 
     suspend fun decreaseHP() {
         backpack.hp -= backpack.damage
@@ -118,6 +120,12 @@ class Player(
             world.screen.setHP(0)
             world.notifyGameOver()
         } else world.screen.setHP(backpack.hp)
+        this.colorMul = Colors["#ff7400"]
+        tween(this::alpha[1.0, 0.4], time=0.3.seconds, easing = Easing.EASE_IN)
+        tween(this::alpha[0.4, 1.0], time=0.3.seconds, easing = Easing.EASE_IN)
+        tween(this::alpha[1.0, 0.4], time=0.3.seconds, easing = Easing.EASE_IN)
+        tween(this::alpha[0.4, 1.0], time=0.3.seconds, easing = Easing.EASE_IN)
+        this.colorMul = Colors["#ffffff"]
     }
 
     suspend fun putBomb() {
@@ -173,21 +181,11 @@ class Player(
         for(item in items) {
             if(distLessThan(x, y, item.x, item.y, 20.0)) {
                 when(item.type) {
-                    TileType.BOMB_INCR -> {
-//                        backpack.maxBomb++
-                        world.screen.setMaxBomb(++backpack.maxBomb)
-                    }
-                    TileType.HEALTH -> {
-//                        backpack.hp++
-                        world.screen.setHP(++backpack.hp)
-                    }
-                    TileType.FLAME -> {
-//                        backpack.blastRange++
-                        world.screen.setBlastRange(++backpack.blastRange)
-                    }
-                    TileType.ATTACK -> {
-                        world.screen.setDamage(++backpack.damage)
-                    }
+                    TileType.BOMB_INCR -> { world.screen.setMaxBomb(++backpack.maxBomb) }
+                    TileType.HEALTH -> { world.screen.setHP(++backpack.hp) }
+                    TileType.FLAME -> { world.screen.setBlastRange(++backpack.blastRange) }
+                    TileType.ATTACK -> { world.screen.setDamage(++backpack.damage) }
+                    TileType.SPEEDUP -> { backpack.speed += 0.1 }
                     TileType.KEY -> {
                         world.gate?.isOpened = true
                         world.gate?.open()

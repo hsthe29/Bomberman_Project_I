@@ -3,44 +3,51 @@ package load
 data class EntryInfo(
     var entryURL: String,
     val mapURL: String,
+    val map: Int,
+    val level: Int,
     val x: Double,
     val y: Double,
     var passed: Boolean,
-    val checkpoint: Boolean = false
+    val checkpoint: Boolean,
+    val nextEntry: Pair<Int, Int>
 )
 
 data class SavedState(var volume: Int,
-                      var map: Int,
-                      var level: Int,
-                      val mapInfo: Array<Array<EntryInfo>>)
+                      val nextEntryLevel: Pair<Int, Int>,
+                      val totalMap: Int,
+                      val mapEntries: Array<Array<EntryInfo>>)
 
-object GameState{
+object GameState {
     val title: String
     val width: Int
     val height: Int
     var volume: Int
-    var map: Int
-    var level: Int
-    val mapInfo: Array<Array<EntryInfo>>
+    var nextEntryLevel: Pair<Int, Int>
+    val totalMap: Int
+    val maxLevels: IntArray
+    val mapEntries: Array<Array<EntryInfo>>
     init {
         val temp = JsonTool.loadFromJson<SavedState>("databases/gamestate.json", SavedState::class.java)
         title = "Bomberman"
         width = 1400
         height = 800
         volume = temp.volume
-        map = temp.map
-        level = temp.level
-        mapInfo = temp.mapInfo
+        nextEntryLevel = temp.nextEntryLevel
+        totalMap = temp.totalMap
+        mapEntries = temp.mapEntries
+        maxLevels = IntArray(totalMap){ mapEntries[it].size }
         println("_______________ Load successfully _______________")
     }
 
     fun initialize() {
         println("Initialized")
     }
-    fun mapOf(map: Int): Array<EntryInfo> = mapInfo[map]
+    fun entriesOf(map: Int): Array<EntryInfo> = mapEntries[map]
+
+    fun nextEntry(next: Pair<Int, Int>) = mapEntries[next.first][next.second]
 
     fun save() {
-        JsonTool.saveToJson("databases/gamestate.json", SavedState(volume, map, level, mapInfo))
+        JsonTool.saveToJson("databases/gamestate.json", SavedState(volume, nextEntryLevel, totalMap, mapEntries))
     }
 }
 

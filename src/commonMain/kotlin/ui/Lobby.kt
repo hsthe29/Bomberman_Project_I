@@ -28,9 +28,9 @@ class Lobby(val map: Int):Scene() {
                 scale(1.0)
                 xy(700.0, 400.0)
             }
-            val position = GameState.mapOf(map)
-            position.fastForEachWithIndex { id, value ->
-                entry(this@Lobby, id, value) {
+            val entries = GameState.entriesOf(map)
+            entries.fastForEachWithIndex { id, info ->
+                entry(this@Lobby, id, info) {
                     scale(0.3)
                     mouse {
                         onOver { scale = 0.35 }

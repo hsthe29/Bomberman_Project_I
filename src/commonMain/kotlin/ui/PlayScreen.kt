@@ -16,12 +16,12 @@ import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
 import entities.*
 import load.*
+import ui.component.*
 import ui.level.*
 
-class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
+class PlayScreen(val info: EntryInfo): Scene() {
     private lateinit var world: World
     private lateinit var player: Player
-    private lateinit var endGame: Container
     private lateinit var statusbar: Container
     private var receiveKeyInput = true
     private lateinit var hpInfo: Pair<Image, Text>
@@ -105,10 +105,6 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
             }
         }
 
-        endGame = container {
-            hide(time=0.seconds, easing = Easing.EASE_IN_OUT)
-        }
-
         world.addUpdater {
             if(receiveKeyInput) {
                 launch { player.update(input) }
@@ -175,105 +171,48 @@ class PlayScreen(val level: Int, val info: EntryInfo): Scene() {
 
     }
     private fun endShow() {
-        receiveKeyInput = false
+        receiveKeyInput = true
         world.colorMul = Colors["#ffffff"]
         statusbar.colorMul = Colors["#ffffff"]
 
     }
+
+    suspend fun resume() {
+        pause.bitmap = resourcesVfs["icons/pause-button.png"].readBitmapSlice()
+        endShow()
+    }
     suspend fun showGameOver() {
         preShow()
-        with(endGame) {
-            image(resourcesVfs["items/defeated_base.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                x = 700.0
-                y = 400.0
+        with(sceneContainer) {
+            defeated(this@PlayScreen) {
+                initialize()
             }
-            image(resourcesVfs["icons/exit-game.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                scale(0.2)
-                x = 900.0 + width*0.5*scale
-                y = 600.0
-                onClick { sceneContainer.changeTo({ Lobby(GameState.map) }) }
-            }
-            image(resourcesVfs["icons/replay-game.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                scale(0.2)
-                x = 500.0 - width*0.5*scale
-                y = 600.0
-                onClick { sceneContainer.changeTo({ PlayScreen(level, info) }) }
-            }
-            show(0.8.seconds, Easing.EASE_IN)
         }
     }
 
     suspend fun showGameWin() {
         updateGameState()
         preShow()
-        with(endGame) {
-            image(resourcesVfs["items/won_base.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                xy(700.0,400.0)
+        with(sceneContainer) {
+            won(this@PlayScreen) {
+                initialize()
             }
-            image(resourcesVfs["icons/exit-game.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                scale(0.2)
-                x = 900.0 + width*0.5*scale
-                y = 600.0
-                onClick {
-                    sceneContainer.changeTo({ Lobby(GameState.map) })
-                }
-            }
-            image(resourcesVfs["icons/next-game.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                scale(0.2)
-                x = 500.0 - width*0.5*scale
-                y = 600.0
-                onClick {
-                    sceneContainer.changeTo({ PlayScreen(level, info) })
-                }
-            }
-            show(0.8.seconds, Easing.EASE_IN)
         }
     }
 
     suspend fun showGamePaused() {
         preShow()
-        with(endGame) {
-            image(resourcesVfs["items/won_base.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                xy(700.0,400.0)
+        with(sceneContainer) {
+            paused(this@PlayScreen) {
+                initialize()
             }
-            image(resourcesVfs["icons/exit-game.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                scale(0.2)
-                x = 900.0 + width*0.5*scale
-                y = 600.0
-                onClick {
-                    sceneContainer.changeTo({ Lobby(GameState.map) })
-                }
-            }
-            image(resourcesVfs["icons/resume-game.png"].readBitmap()) {
-                anchor(0.5, 0.5)
-                scale(0.2)
-                x = 500.0 - width*0.5*scale
-                y = 600.0
-                onClick {
-                    pause.bitmap = resourcesVfs["icons/pause-button.png"].readBitmapSlice()
-                    this@with.hide(time=0.3.seconds, easing = Easing.EASE_OUT)
-                    endShow()
-                    receiveKeyInput = true
-                }
-            }
-            show(0.8.seconds, Easing.EASE_IN)
         }
     }
 
     private fun updateGameState() {
+        if(info.passed) return
         info.passed = true
         info.entryURL = info.entryURL.replace(".png", "_passed.png")
-        if(info.checkpoint) {
-            GameState.map++
-            GameState.level = 0
-        } else GameState.level++
+        GameState.nextEntryLevel = info.nextEntry
     }
 }

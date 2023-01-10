@@ -17,7 +17,7 @@ import kotlin.coroutines.*
 val directions = listOf(1 to 0, -1 to 0, 0 to 1, 0 to -1)
 
 class Bomb(val layer: Layer, private val col: Int, private val row: Int)
-    : OImage(BitmapDB.getBitmap("items/icebomb.png")) {
+    : OImage(BitmapDB.getBitmap("items/bomb.png")) {
     private var triggered = false
     var dealtDamage = false
     val block = arrayOf(false, false, false, false)
@@ -28,10 +28,10 @@ class Bomb(val layer: Layer, private val col: Int, private val row: Int)
         this.y = row*45.0 + 22.0
     }
     suspend fun ticking(player: Player) {
-        this.tween(::scale[0.7, 0.5], time = 0.4.seconds, easing = Easing.EASE_IN_OUT)
-        this.tween(::scale[0.5, 0.7], time = 0.4.seconds, easing = Easing.EASE_IN_OUT)
-        this.tween(::scale[0.7, 0.5], time = 0.4.seconds, easing = Easing.EASE_IN_OUT)
-        this.tween(::scale[0.5, 0.8], time = 0.85.seconds, easing = Easing.EASE_IN_OUT)
+        this.tween(::scale[0.7, 0.6], time = 0.4.seconds, easing = Easing.EASE_IN_OUT)
+        this.tween(::scale[0.6, 0.7], time = 0.4.seconds, easing = Easing.EASE_IN_OUT)
+        this.tween(::scale[0.7, 0.6], time = 0.4.seconds, easing = Easing.EASE_IN_OUT)
+        this.tween(::scale[0.6, 0.8], time = 0.85.seconds, easing = Easing.EASE_IN_OUT)
         trigger(player)
     }
 
