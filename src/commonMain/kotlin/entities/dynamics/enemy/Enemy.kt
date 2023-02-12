@@ -12,7 +12,11 @@ abstract class Enemy(animates: SpriteDirections, val kind: MoveKind): Person(ani
 
     init {
         direction = if(kind == MoveKind.HORIZONTAL) MoveDirection.LEFT else MoveDirection.DOWN
-
+        play(when(direction) {
+            MoveDirection.LEFT -> animates.left
+            MoveDirection.DOWN -> animates.down
+            else -> { animates.right }
+        })
     }
     abstract fun update()
 

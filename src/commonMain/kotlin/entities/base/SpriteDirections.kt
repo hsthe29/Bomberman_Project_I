@@ -46,6 +46,84 @@ fun bomberAnimations(spriteMap: Bitmap) = SpriteDirections(
     )
 )
 
+fun ghostAnimations(spriteMap: Bitmap) = SpriteDirections(
+    left = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 0,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    ),
+    right = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 25,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    ),
+    up = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 0,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    ),
+    down = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 25,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    )
+)
+
+fun skeletonAnimations(spriteMap: Bitmap) = SpriteDirections(
+    left = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 0,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    ),
+    right = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 25,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    ),
+    up = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 25,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    ),
+    down = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 35,
+        spriteHeight = 25,
+        marginTop = 25,
+        marginLeft = 0,
+        columns = 4,
+        rows = 1
+    )
+)
+
 fun redExplosionAnimation(spriteMap: Bitmap) = SpriteAnimation(
         spriteMap = spriteMap,
         spriteWidth = 45,

@@ -13,6 +13,7 @@ import core.base.*
 import entities.*
 import entities.bomb.*
 import entities.dynamics.*
+import entities.dynamics.enemy.*
 import entities.statics.*
 import entities.statics.items.Gate
 import kotlinx.coroutines.*
@@ -38,6 +39,7 @@ class World(val screen: MainScreen): Container() {
     val flameInfo: Pair<Image, Text>
     val attackInfo: Pair<Image, Text>
     lateinit var bomber: Bomber
+    val enemies = arrayListOf<Enemy>()
 
     val putLayer = Layer(this)
     var gate: Gate? = null

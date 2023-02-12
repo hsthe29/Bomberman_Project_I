@@ -1,5 +1,6 @@
 package ui
 
+import com.soywiz.kds.iterators.*
 import com.soywiz.klock.*
 import com.soywiz.korev.*
 import com.soywiz.korge.animate.*
@@ -16,6 +17,7 @@ import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
 import entities.*
 import entities.dynamics.*
+import entities.dynamics.enemy.*
 import load.*
 import ui.component.*
 import ui.level.*
@@ -33,6 +35,19 @@ class MainScreen(val info: EntryInfo): Scene() {
             y = 40.0
             for(layer in mapInfo.layers) {
                 layer(layer.layerName, layer.tileInfo)
+            }
+            for(e in mapInfo.enemies) {
+                enemies.add(if(e.type == "GHOST") {
+                    ghost(e.kind){
+                        anchor(0.5, 0.5)
+                        xy(45*e.pos.first + 23, 45*e.pos.second + 23)
+                    }
+                    } else {
+                    skeleton(e.kind) {
+
+                    }
+                    }
+                )
             }
             bomber = bomber {
                 anchor(0.5, 0.5)
@@ -107,6 +122,11 @@ class MainScreen(val info: EntryInfo): Scene() {
         }
         world.addUpdater {
             if(receiveKeyInput) {
+                launch {
+                    for(e in world.enemies) {
+                        launch { e.update() }
+                    }
+                }
                 launch { bomber.update(input) }
                 if (input.keys[Key.LEFT]) if (x < 0.0) x++
                 if (input.keys[Key.RIGHT]) if (x > -265.0) x--
