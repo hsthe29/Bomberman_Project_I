@@ -2,6 +2,7 @@ package ui
 
 import com.soywiz.kds.iterators.*
 import com.soywiz.klock.*
+import com.soywiz.korau.sound.*
 import com.soywiz.korge.animate.*
 import com.soywiz.korge.input.*
 import com.soywiz.korge.scene.*
@@ -15,13 +16,16 @@ import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
 import load.*
 import ui.component.*
-import kotlin.system.*
 
-class Lobby(val map: Int):Scene() {
+class Lobby(val map: Int): Scene() {
     private lateinit var background: Container
     private lateinit var nextMap: Image
 
     override suspend fun SContainer.sceneInit() {
+        val sound = resourcesVfs["sound/bkg/Forest Imps Inn (forest stage).mp3"].readMusic()
+        val channel = sound.play(PlaybackTimes.INFINITE)
+        channel.volume = GameState.volume*0.2
+
         background = container {
             image(resourcesVfs["backgrounds/map_process_${map}.png"].readBitmap()) {
                 anchor(.5, .5)
@@ -30,11 +34,24 @@ class Lobby(val map: Int):Scene() {
             }
             val entries = GameState.entriesOf(map)
             entries.fastForEachWithIndex { id, info ->
-                entry(this@Lobby, id, info) {
+                entry(id, info) {
                     scale(0.3)
                     mouse {
                         onOver { scale = 0.35 }
                         onOut { scale = 0.3 }
+                    }
+                    onClick {
+                        if (info.passed || Pair(info.map, info.level) == GameState.nextEntryLevel) {
+                            channel.stop()
+                            sceneContainer.changeTo({
+                                MainScreen(info)
+                            })
+                        } else {
+                            val cn = VfsDB.getSound("sound/sfx/dummy_die.mp3").play(PlaybackTimes.ONE)
+                            cn.volume = GameState.volume*0.2
+                            notifyMessage("You have to complete previous level first!")
+                            cn.stop()
+                        }
                     }
                 }
             }
@@ -59,27 +76,23 @@ class Lobby(val map: Int):Scene() {
                     anchor(0.5, 0.5)
                     xy(1360.0, 40.0)
                 }
-                image(BitmapDB.getBitmap("icons/cancel-dark.png")) {
+                image(VfsDB.getBitmap("icons/cancel-dark.png")) {
                     anchor(0.5, 0.5)
                     position(1360, 40)
                     mouse {
                         onOver {
                             scale = 1.2
-                            bitmap = BitmapDB.getBitmap("icons/cancel-light.png").slice()
+                            bitmap = VfsDB.getBitmap("icons/cancel-light.png").slice()
                         }
                         onOut {
                             scale = 1.0
-                            bitmap = BitmapDB.getBitmap("icons/cancel-dark.png").slice()
+                            bitmap = VfsDB.getBitmap("icons/cancel-dark.png").slice()
                         }
                     }
-                    onClick { exitProcess(0) }
+                    onClick { views.close() }
                 }
             }
         }
-
-    }
-
-    override suspend fun SContainer.sceneMain() {
         nextMap.onClick {
             launchImmediately {
                 background.colorMul = Colors["#7a7a7a"]
@@ -94,6 +107,10 @@ class Lobby(val map: Int):Scene() {
 
             }
         }
+    }
+
+    override suspend fun SContainer.sceneMain() {
+
     }
 
     suspend fun notifyMessage(msg: String, textSize: Double = 35.0, backColor: RGBA = Colors.BLACK, frontColor: RGBA = Colors.WHITE) {

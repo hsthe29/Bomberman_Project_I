@@ -9,10 +9,11 @@ import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.annotations.ViewDslMarker
 import com.soywiz.korma.interpolation.*
+import entities.*
 import load.*
 import ui.*
 
-class DefeatedBase(private val scene: PlayScreen): Container() {
+class DefeatedBase(private val scene: MainScreen): Container() {
 
     suspend fun initialize() {
         hide(time=0.seconds)
@@ -20,23 +21,27 @@ class DefeatedBase(private val scene: PlayScreen): Container() {
         image(resourcesVfs["icons/exit-game.png"].readBitmap(), 0.5, 0.5) {
             scale(0.2)
             xy(900.0 + width*0.5*scale, 600.0)
-            onClick { scene.sceneContainer.changeTo({
+            onClick {
                 this@DefeatedBase.removeFromParent()
-                Lobby(GameState.nextEntryLevel.first) })
+                scene.sceneContainer.changeTo({
+                    Lobby(GameState.nextEntryLevel.first)
+                })
             }
         }
         image(resourcesVfs["icons/replay-game.png"].readBitmap(), 0.5, 0.5) {
             scale(0.2)
             xy(500.0 - width*0.5*scale, 600.0)
-            onClick { scene.sceneContainer.changeTo({
+            onClick {
                 this@DefeatedBase.removeFromParent()
-                PlayScreen(scene.info) })
+                scene.sceneContainer.changeTo({
+                    MainScreen(scene.info)
+                })
             }
         }
         show(0.5.seconds, Easing.EASE_IN)
     }
 }
 
-inline fun SceneContainer.defeated(screen: PlayScreen, callback: @ViewDslMarker DefeatedBase.() -> Unit = {}): DefeatedBase {
+inline fun SceneContainer.defeated(screen: MainScreen, callback: @ViewDslMarker DefeatedBase.() -> Unit = {}): DefeatedBase {
     return DefeatedBase(screen).addTo(this, callback)
 }

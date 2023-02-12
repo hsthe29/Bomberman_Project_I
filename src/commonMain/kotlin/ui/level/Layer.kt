@@ -1,11 +1,10 @@
 package ui.level
 
 import com.soywiz.korge.view.*
-import core.base.*
-import core.base.OImage as Tile
-import entities.tiles.*
+import entities.statics.*
+import entities.statics.items.*
+import entities.statics.tiles.*
 import load.*
-import java.lang.Exception
 
 class Layer(var world: World, val layerName:String = "object", tiles: List<TileInfo> = listOf()): Container() {
     private val positions = mutableListOf<Pair<Int, Int>>()
@@ -14,11 +13,11 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
     init {
         tiles.forEach {
             when(it.type) {
-                TileType.HEALTH -> hitpoint(it)
+                TileType.HEALTH -> hpItem(it)
                 TileType.KEY -> key(it)
-                TileType.BOMB_INCR -> ibomb(it)
+                TileType.BOMB_INCR -> bombItem(it)
                 TileType.GATE -> gate(it)
-                TileType.FLAME -> iflame(it)
+                TileType.FLAME -> flameItem(it)
                 TileType.BRICK -> brick(it)
                 TileType.STONE -> stone(it)
                 TileType.GROUND -> ground(it)
@@ -36,7 +35,7 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
 
     operator fun set(col: Int, row: Int, value: Tile?) {
         if(value != null) {
-            value.addTo(this)
+            value.instance.addTo(this)
             positions.add(Pair(col, row))
         } else {
             data[col][row]?.removeFromParent()

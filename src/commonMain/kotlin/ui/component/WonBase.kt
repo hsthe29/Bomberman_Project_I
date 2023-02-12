@@ -9,10 +9,11 @@ import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.annotations.ViewDslMarker
 import com.soywiz.korma.interpolation.*
+import entities.*
 import load.*
 import ui.*
 
-class WonBase(private val scene: PlayScreen): Container() {
+class WonBase(private val scene: MainScreen): Container() {
 
     suspend fun initialize() {
         hide(time=0.seconds)
@@ -21,23 +22,27 @@ class WonBase(private val scene: PlayScreen): Container() {
             scale(0.2)
             xy(900.0 + width*0.5*scale, 600.0)
             onClick {
-                this@WonBase.removeFromParent()
-                scene.sceneContainer.changeTo({ Lobby(GameState.nextEntryLevel.first) })
+                scene.sceneContainer.changeTo({
+                    this@WonBase.removeFromParent()
+                    Lobby(GameState.nextEntryLevel.first)
+                })
             }
         }
         image(resourcesVfs["icons/next-game.png"].readBitmap(), 0.5, 0.5) {
             scale(0.2)
             xy(500.0 - width*0.5*scale, 600.0)
             onClick {
-                this@WonBase.removeFromParent()
-                scene.sceneContainer.changeTo({ PlayScreen(GameState.nextEntry(scene.info.nextEntry)) })
+                scene.sceneContainer.changeTo({
+                    this@WonBase.removeFromParent()
+                    MainScreen(GameState.nextEntry(scene.info.nextEntry))
+                })
             }
         }
         show(0.5.seconds, Easing.EASE_IN)
     }
 }
 
-inline fun SceneContainer.won(screen: PlayScreen, callback: @ViewDslMarker WonBase.() -> Unit = {}): WonBase {
+inline fun SceneContainer.won(screen: MainScreen, callback: @ViewDslMarker WonBase.() -> Unit = {}): WonBase {
     return WonBase(screen).addTo(this, callback)
 }
 

@@ -1,6 +1,7 @@
 package ui
 
 import com.soywiz.klock.*
+import com.soywiz.korau.sound.*
 import com.soywiz.korge.animate.*
 import com.soywiz.korge.input.*
 import com.soywiz.korge.scene.*
@@ -16,10 +17,12 @@ import com.soywiz.korma.interpolation.*
 import kotlinx.coroutines.async
 import load.*
 import ui.component.*
-import kotlin.system.*
 
 class LoadingScreen : Scene() {
     override suspend fun SContainer.sceneMain() {
+        val sound = resourcesVfs["sound/bkg/Intro.mp3"].readMusic()
+        val channel = sound.play(PlaybackTimes.INFINITE)
+        channel.volume = GameState.volume*0.2
         val background = image(resourcesVfs["backgrounds/loading_bg.png"].readBitmap()) {
             anchor(0.5, 0.5)
             xy(700.0, 400.0)
@@ -44,65 +47,71 @@ class LoadingScreen : Scene() {
         })
         val loader = async{
             GameState.initialize()
-            for(url in urls) {
-                println(url)
-                BitmapDB.loadToDB(url)
-            }
+            VfsDB.loadAllToDB(urls)
+            VfsDB.loadSound("sound/sfx/bomb_explode.mp3")
+            VfsDB.loadSound("sound/sfx/bomber_die.mp3")
+            VfsDB.loadSound("sound/sfx/bomber_walk.mp3")
+            VfsDB.loadSound("sound/sfx/defeat.mp3")
+            VfsDB.loadSound("sound/sfx/victory.mp3")
+            VfsDB.loadSound("sound/sfx/dummy_die.mp3")
+            VfsDB.loadSound("sound/sfx/skeleton_walk.mp3")
             TextFont.load()
         }
         progressBar.assignLoader(loader)
         progressBar.loadAsync()
 
-        val start = image(BitmapDB.getBitmap("icons/start-button.png")) {
+        val start = image(VfsDB.getBitmap("icons/start-button.png")) {
             anchor(0.5, 0.5)
             scale(0.5)
             position(700, 420)
             hide(0.seconds)
             mouse {
                 onOver {
-                    this@image.bitmap = BitmapDB.getBitmap("icons/start-button-colored.png").slice()
+                    this@image.bitmap = VfsDB.getBitmap("icons/start-button-colored.png").slice()
                     this@image.scale = 0.6
                 }
                 onOut {
-                    this@image.bitmap = BitmapDB.getBitmap("icons/start-button.png").slice()
+                    this@image.bitmap = VfsDB.getBitmap("icons/start-button.png").slice()
                     this@image.scale = 0.5
                 }
             }
             onClick {
-                sceneContainer.changeTo({ Lobby(GameState.nextEntryLevel.first) }) }
+                channel.stop()
+                sceneContainer.changeTo({ Lobby(GameState.nextEntryLevel.first) })
+            }
         }
-        val settings = image(BitmapDB.getBitmap("icons/settings-button.png")) {
+        val settings = image(VfsDB.getBitmap("icons/settings-button.png")) {
             anchor(0.5, 0.5)
             scale(0.5)
             position(700, 510)
             hide(0.seconds)
             mouse {
                 onOver {
-                    this@image.bitmap = BitmapDB.getBitmap("icons/settings-button-colored.png").slice()
+                    this@image.bitmap = VfsDB.getBitmap("icons/settings-button-colored.png").slice()
                     this@image.scale = 0.6
                 }
                 onOut {
-                    this@image.bitmap = BitmapDB.getBitmap("icons/settings-button.png").slice()
+                    this@image.bitmap = VfsDB.getBitmap("icons/settings-button.png").slice()
                     this@image.scale = 0.5
                 }
             }
         }
-        val exit = image(BitmapDB.getBitmap("icons/exit-button.png")) {
+        val exit = image(VfsDB.getBitmap("icons/exit-button.png")) {
             anchor(0.5, 0.5)
             scale(0.5)
             position(700, 600)
             hide(0.seconds)
             mouse {
                 onOver {
-                    this@image.bitmap = BitmapDB.getBitmap("icons/exit-button-colored.png").slice()
+                    this@image.bitmap = VfsDB.getBitmap("icons/exit-button-colored.png").slice()
                     this@image.scale = 0.6
                 }
                 onOut {
-                    this@image.bitmap = BitmapDB.getBitmap("icons/exit-button.png").slice()
+                    this@image.bitmap = VfsDB.getBitmap("icons/exit-button.png").slice()
                     this@image.scale = 0.5
                 }
             }
-            onClick { exitProcess(0) }
+            onClick { views.close() }
         }
         settings.onClick {
             val closeDark = resourcesVfs["icons/cancel-dark.png"].readBitmap()
@@ -151,6 +160,7 @@ class LoadingScreen : Scene() {
                     onClick {
                         if(GameState.volume > 0) {
                             GameState.volume--
+                            channel.volume = GameState.volume*0.2
                             volume.bitmap = resourcesVfs["icons/volume_${GameState.volume}.png"].readBitmap().slice()
                         }
                     }
@@ -162,6 +172,7 @@ class LoadingScreen : Scene() {
                     onClick {
                         if(GameState.volume < 5) {
                             GameState.volume++
+                            channel.volume = GameState.volume*0.2
                             volume.bitmap = resourcesVfs["icons/volume_${GameState.volume}.png"].readBitmap().slice()
                         }
                     }

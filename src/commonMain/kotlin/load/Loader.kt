@@ -30,6 +30,7 @@ val urls = arrayOf(
         "items/bombpower.png",
         "items/heartfull.png",
         "tiles/brick-2.png",
+        "items/sword.png",
         "items/bomb.png",
         "items/flame.png",
         "items/icebomb.png",

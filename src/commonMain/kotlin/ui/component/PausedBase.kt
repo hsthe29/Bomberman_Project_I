@@ -4,16 +4,16 @@ import com.soywiz.klock.*
 import com.soywiz.korge.input.*
 import com.soywiz.korge.scene.*
 import com.soywiz.korge.view.*
-import com.soywiz.korge.view.onClick
 import com.soywiz.korge.view.tween.*
 import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.annotations.ViewDslMarker
 import com.soywiz.korma.interpolation.*
+import entities.dynamics.*
 import load.*
 import ui.*
 
-class PausedBase(private val scene: PlayScreen): Container() {
+class PausedBase(private val scene: MainScreen): Container() {
 
     suspend fun initialize() {
         hide(time=0.seconds)
@@ -23,7 +23,9 @@ class PausedBase(private val scene: PlayScreen): Container() {
             xy(900.0 + width*0.5*scale, 600.0)
             onClick {
                 this@PausedBase.removeFromParent()
-                scene.sceneContainer.changeTo({ Lobby(GameState.nextEntryLevel.first) })
+                scene.sceneContainer.changeTo({
+                    Lobby(GameState.nextEntryLevel.first)
+                })
             }
         }
         image(resourcesVfs["icons/replay-game.png"].readBitmap(), 0.5, 0.5) {
@@ -32,7 +34,9 @@ class PausedBase(private val scene: PlayScreen): Container() {
             y = 600.0
             onClick {
                 this@PausedBase.removeFromParent()
-                scene.sceneContainer.changeTo({ PlayScreen(scene.info) })
+                scene.sceneContainer.changeTo({
+                    MainScreen(scene.info)
+                })
             }
         }
         image(resourcesVfs["icons/resume-game.png"].readBitmap(), 0.5, 0.5) {
@@ -48,6 +52,6 @@ class PausedBase(private val scene: PlayScreen): Container() {
     }
 }
 
-inline fun SceneContainer.paused(screen: PlayScreen, callback: @ViewDslMarker PausedBase.() -> Unit = {}): PausedBase {
+inline fun SceneContainer.paused(screen: MainScreen, callback: @ViewDslMarker PausedBase.() -> Unit = {}): PausedBase {
     return PausedBase(screen).addTo(this, callback)
 }
