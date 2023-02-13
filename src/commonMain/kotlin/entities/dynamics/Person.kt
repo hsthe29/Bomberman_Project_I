@@ -4,10 +4,13 @@ import com.soywiz.korge.view.*
 import core.base.*
 import core.physics.*
 import entities.base.*
+import entities.bomb.*
 import entities.statics.*
 
 abstract class Person(protected val animates: SpriteDirections): AnimationObj(animates.down), Attackable {
     abstract var speed: Double
+    var alive = true
+    var immune = false
 
     override fun dealDamage(): Int {
         return attack
@@ -23,6 +26,21 @@ abstract class Person(protected val animates: SpriteDirections): AnimationObj(an
     protected fun feasibleDirection(delta: Double, tiles: List<Tile>): BooleanArray {
         val ret = booleanArrayOf(true, true, true, true)
         for(tile in tiles) {
+            if(tile is Bomb) {
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y-delta, 20.0), tile.boundRectangle())) {
+                    if(tile.lockMove) ret[2] = false
+                } else tile.lockMove = true
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y+delta, 20.0), tile.boundRectangle())) {
+                    if(tile.lockMove) ret[3] = false
+                } else tile.lockMove = true
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x-delta, y, 20.0), tile.boundRectangle())) {
+                    if(tile.lockMove) ret[0] = false
+                } else tile.lockMove = true
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x+delta, y, 20.0), tile.boundRectangle())) {
+                    if(tile.lockMove) ret[1] = false
+                } else tile.lockMove = true
+                continue
+            }
             if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y-delta, 20.0), tile.boundRectangle()))
                 ret[2] = false
             if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y+delta, 20.0), tile.boundRectangle()))
@@ -35,4 +53,5 @@ abstract class Person(protected val animates: SpriteDirections): AnimationObj(an
         return ret
     }
 
+    abstract suspend fun takeDamage(damage: Int)
 }

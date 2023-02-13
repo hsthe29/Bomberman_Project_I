@@ -33,7 +33,14 @@ inline fun Container.world(screen: MainScreen, callback: @ViewDslMarker World.()
     World(screen).addTo(this, callback)
 
 class World(val screen: MainScreen): Container() {
-    private val layers = hashMapOf<String, Layer>()
+    lateinit var groundLayer: Layer
+        private set
+    lateinit var itemLayer: Layer
+        private set
+    var explosionLayer: Layer = Layer(this)
+        private set
+    lateinit var stoneLayer: Layer
+        private set
     val hpInfo: Pair<Image, Text>
     val bombInfo: Pair<Image, Text>
     val flameInfo: Pair<Image, Text>
@@ -41,11 +48,7 @@ class World(val screen: MainScreen): Container() {
     lateinit var bomber: Bomber
     val enemies = arrayListOf<Enemy>()
 
-    val putLayer = Layer(this)
-    var gate: Gate? = null
-        set(value) {
-            if(field == null) field = value
-        }
+    lateinit var gate: Gate
 
     init {
         hpInfo = Pair(
@@ -70,32 +73,38 @@ class World(val screen: MainScreen): Container() {
     }
 
     fun addLayer(layer: Layer, callback: @ViewDslMarker Layer.() -> Unit = {}) {
-        layers[layer.layerName] = layer
-        layer.addTo(this, callback)
-        if(layer.layerName == "item") {
-            putLayer.addTo(this)
+        when(layer.layerName) {
+            "ground" -> groundLayer = layer
+            "item" -> {
+                itemLayer = layer
+                explosionLayer.addTo(this)
+            }
+            "stone" -> stoneLayer = layer
         }
-
+        layer.addTo(this, callback)
     }
 
     fun getLayer(name: String): Layer {
-        return layers[name]?: throw InvalidKeyException("$name not found")
+        return when(name) {
+            "ground" -> groundLayer
+            "item" -> itemLayer
+            "stone" -> stoneLayer
+            else -> TODO("Invalid layer named: \"$name\"")
+        }
     }
 
     // Get tiles around Player
     fun allTilesWithin(x: Double, y: Double, name: String = "stone"): List<Tile> {
         val tiles = mutableListOf<Tile>()
-        val layer = layers[name]
-        if(layer != null) {
-            val stX = max(0, ((x - 55.0)/45.0).toInt())
-            val stY = max(0, ((y - 55.0)/45.0).toInt())
-            val endX = min(36, ((x + 55.0)/45.0).toInt())
-            val endY = min(16, ((y + 55.0)/45.0).toInt())
-            for(i in stX..endX) {
-                for(j in stY..endY) {
-                    if(layer[i, j] != null) {
-                        tiles.add(layer[i, j]!!)
-                    }
+        val layer = getLayer(name)
+        val stX = max(0, ((x - 55.0)/45.0).toInt())
+        val stY = max(0, ((y - 55.0)/45.0).toInt())
+        val endX = min(36, ((x + 55.0)/45.0).toInt())
+        val endY = min(16, ((y + 55.0)/45.0).toInt())
+        for(i in stX..endX) {
+            for(j in stY..endY) {
+                if(layer[i, j] != null) {
+                    tiles.add(layer[i, j]!!)
                 }
             }
         }
@@ -139,7 +148,7 @@ class World(val screen: MainScreen): Container() {
     }
 
     suspend fun putBombAt(player: Bomber, col: Int, row: Int) {
-        putLayer.bomb(col, row) {
+        stoneLayer.bomb(col, row) {
             ticking(player)
         }
     }

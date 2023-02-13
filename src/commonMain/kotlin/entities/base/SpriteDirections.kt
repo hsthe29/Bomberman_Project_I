@@ -88,38 +88,38 @@ fun ghostAnimations(spriteMap: Bitmap) = SpriteDirections(
 fun skeletonAnimations(spriteMap: Bitmap) = SpriteDirections(
     left = SpriteAnimation(
         spriteMap = spriteMap,
-        spriteWidth = 35,
-        spriteHeight = 25,
+        spriteWidth = 40,
+        spriteHeight = 27,
         marginTop = 0,
         marginLeft = 0,
-        columns = 4,
+        columns = 6,
         rows = 1
     ),
     right = SpriteAnimation(
         spriteMap = spriteMap,
-        spriteWidth = 35,
-        spriteHeight = 25,
-        marginTop = 25,
+        spriteWidth = 40,
+        spriteHeight = 47,
+        marginTop = 47,
         marginLeft = 0,
-        columns = 4,
+        columns = 6,
         rows = 1
     ),
     up = SpriteAnimation(
         spriteMap = spriteMap,
-        spriteWidth = 35,
-        spriteHeight = 25,
-        marginTop = 25,
+        spriteWidth = 40,
+        spriteHeight = 47,
+        marginTop = 47,
         marginLeft = 0,
-        columns = 4,
+        columns = 6,
         rows = 1
     ),
     down = SpriteAnimation(
         spriteMap = spriteMap,
-        spriteWidth = 35,
-        spriteHeight = 25,
-        marginTop = 25,
+        spriteWidth = 40,
+        spriteHeight = 47,
+        marginTop = 0,
         marginLeft = 0,
-        columns = 4,
+        columns = 6,
         rows = 1
     )
 )

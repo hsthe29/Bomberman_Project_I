@@ -1,19 +1,20 @@
 package entities.statics.items
 
-import com.soywiz.korge.view.*
-import core.base.*
+import com.soywiz.korma.annotations.*
 import entities.dynamics.*
-import entities.statics.*
 import load.*
 import ui.level.*
 
-class Key(val layer: Layer,
-          info: TileInfo)
+class Attack(val layer: Layer,
+          info: TileInfo
+)
     : Item(bitmap = VfsDB.getBitmap(info.url)) {
 
-    override val type = TileType.KEY
+    override val type = TileType.ATTACK
+
     override val row = info.row
     override val col = info.col
+
     init {
         layer[info.col, info.row] = this
         x = 45.0*info.col + 22.0
@@ -21,13 +22,11 @@ class Key(val layer: Layer,
     }
 
     override suspend fun takeEffect(bomber: Bomber) {
-        bomber.world.gate.isOpened = true
-        bomber.world.gate.open()
+        bomber.world.updateAttack(++bomber.attack)
         bomber.world.itemLayer[col, row] = null
     }
 }
 
-inline fun Layer.key(info: TileInfo, callback: @ViewDslMarker Key.() -> Unit = {}): Key {
-    return Key(this, info).apply(callback)
+inline fun Layer.attack(info: TileInfo, callback: @ViewDslMarker Attack.() -> Unit = {}): Attack {
+    return Attack(this, info).apply(callback)
 }
-

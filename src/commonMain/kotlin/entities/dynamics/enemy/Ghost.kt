@@ -1,16 +1,11 @@
 package entities.dynamics.enemy
 
-import com.soywiz.korev.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.format.*
-import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
 import core.base.*
 import entities.base.*
-import entities.bomb.*
-import entities.dynamics.*
 import ui.level.*
-import kotlin.coroutines.*
 
 suspend inline fun World.ghost(kind: MoveKind, callback: @ViewDslMarker Ghost.() -> Unit = {}): Ghost {
     val spriteMap = resourcesVfs["character/ghost.png"].readBitmap()
@@ -19,10 +14,10 @@ suspend inline fun World.ghost(kind: MoveKind, callback: @ViewDslMarker Ghost.()
     return ghost
 }
 
-class Ghost(val world: World, animates: SpriteDirections, kind: MoveKind): Enemy(animates, kind) {
+class Ghost(world: World, animates: SpriteDirections, kind: MoveKind): Enemy(world, animates, kind) {
     override var hitPoint = 3
-    override var attack = 2
-    override var speed = 0.8
+    override var attack = 1
+    override var speed = 0.9
 
     override fun update() {
         val tiles = world.allTilesWithin(x, y)

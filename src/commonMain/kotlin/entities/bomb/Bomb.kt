@@ -16,11 +16,14 @@ import kotlin.coroutines.*
 
 val directions = listOf(1 to 0, -1 to 0, 0 to 1, 0 to -1)
 
-class Bomb(val layer: Layer, private val col: Int, private val row: Int)
+class Bomb(val layer: Layer, override val col: Int, override val row: Int)
     : Item(VfsDB.getBitmap("items/bomb.png")) {
     private var triggered = false
-    var dealtDamage = false
+    var lockMove = false
     val block = arrayOf(false, false, false, false)
+    override suspend fun takeEffect(bomber: Bomber) {
+        TODO("Not yet implemented")
+    }
 
     override val type = TileType.NONE
     init{
@@ -50,7 +53,7 @@ class Bomb(val layer: Layer, private val col: Int, private val row: Int)
                 val _row = (row + loc.second*c)
                 val flame = Flame(layer, this, _col, _row)
                 jobs += CoroutineScope(coroutineContext).launch(start=CoroutineStart.LAZY) { flame.execute(player, dir = dir) }
-                if(layer.occupied(_col, _row)) {
+                if(layer[_col, _row] is Bomb ) {
                     val bomb = layer[_col, _row] as Bomb
                     jobs += CoroutineScope(coroutineContext)
                         .launch(start=CoroutineStart.LAZY) { bomb.trigger(player) }

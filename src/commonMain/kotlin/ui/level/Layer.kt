@@ -18,6 +18,7 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
                 TileType.BOMB_INCR -> bombItem(it)
                 TileType.GATE -> gate(it)
                 TileType.FLAME -> flameItem(it)
+                TileType.ATTACK -> attack(it)
                 TileType.BRICK -> brick(it)
                 TileType.STONE -> stone(it)
                 TileType.GROUND -> ground(it)

@@ -14,7 +14,7 @@ suspend inline fun World.skeleton(kind: MoveKind, callback: @ViewDslMarker Skele
     return skeleton
 }
 
-class Skeleton(val world: World, animates: SpriteDirections, kind: MoveKind): Enemy(animates, kind) {
+class Skeleton(world: World, animates: SpriteDirections, kind: MoveKind): Enemy(world, animates, kind) {
     override var hitPoint = 5
     override var attack = 3
     override var speed = 2.0

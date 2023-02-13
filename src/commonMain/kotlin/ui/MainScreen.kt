@@ -44,7 +44,8 @@ class MainScreen(val info: EntryInfo): Scene() {
                     }
                     } else {
                     skeleton(e.kind) {
-
+                        anchor(0.5, 0.5)
+                        xy(45*e.pos.first + 23, 45*e.pos.second + 23)
                     }
                     }
                 )
@@ -124,7 +125,7 @@ class MainScreen(val info: EntryInfo): Scene() {
             if(receiveKeyInput) {
                 launch {
                     for(e in world.enemies) {
-                        launch { e.update() }
+                        if(e.alive) launch { e.update() }
                     }
                 }
                 launch { bomber.update(input) }

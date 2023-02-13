@@ -1,6 +1,7 @@
 package entities.statics.items
 
 import com.soywiz.korge.view.*
+import entities.dynamics.*
 import entities.statics.*
 import load.*
 import ui.level.*
@@ -11,10 +12,18 @@ class FlameItem(val layer: Layer,
 
     override val type = TileType.FLAME
 
+    override val row = info.row
+    override val col = info.col
+
     init {
         layer[info.col, info.row] = this
         x = 45.0*info.col + 22.0
         y = 45.0*info.row + 22.0
+    }
+
+    override suspend fun takeEffect(bomber: Bomber) {
+        bomber.world.updateRadius(++bomber.explosionRadius)
+        bomber.world.itemLayer[col, row] = null
     }
 }
 

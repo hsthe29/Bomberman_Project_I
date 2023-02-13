@@ -2,6 +2,7 @@ package entities.statics.items
 
 import com.soywiz.korge.view.*
 import core.base.*
+import entities.dynamics.*
 import entities.statics.*
 import load.*
 import ui.level.*
@@ -11,6 +12,8 @@ class HPItem(val layer: Layer,
     : Item(bitmap = VfsDB.getBitmap(info.url)) {
 
     override val type = TileType.HEALTH
+    override val row = info.row
+    override val col = info.col
 
     init {
         layer[info.col, info.row] = this
@@ -18,6 +21,10 @@ class HPItem(val layer: Layer,
         y = 45.0*info.row + 23.0
     }
 
+    override suspend fun takeEffect(bomber: Bomber) {
+        bomber.world.updateHitPoint(++bomber.hitPoint)
+        bomber.world.itemLayer[col, row] = null
+    }
 }
 
 inline fun Layer.hpItem(info: TileInfo, callback: @ViewDslMarker HPItem.() -> Unit = {}): HPItem {

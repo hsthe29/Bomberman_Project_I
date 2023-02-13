@@ -2,6 +2,7 @@ package entities.dynamics
 
 import com.soywiz.klock.*
 import com.soywiz.korev.*
+import com.soywiz.korev.Key
 import com.soywiz.korge.input.*
 import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
@@ -14,6 +15,7 @@ import core.base.*
 import core.physics.*
 import entities.base.*
 import entities.statics.*
+import entities.statics.items.*
 import load.*
 import ui.level.*
 import kotlin.coroutines.*
@@ -26,7 +28,7 @@ suspend inline fun World.bomber(callback: @ViewDslMarker Bomber.() -> Unit = {})
 }
 class Bomber(val world: World, animates: SpriteDirections): Person(animates) {
     override var speed: Double = 1.0
-    override var hitPoint: Int = 3
+    override var hitPoint: Int = 300
     override var attack: Int = 1
     var maxBomb = 1
     var bombCount = 0
@@ -92,7 +94,7 @@ class Bomber(val world: World, animates: SpriteDirections): Person(animates) {
         if(bombCount < maxBomb) {
             val row = (this.y/45.0).toInt()
             val col = (this.x/45.0).toInt()
-            if(!world.putLayer.occupied(col, row)) {
+            if(!world.stoneLayer.occupied(col, row)) {
                 bombCount++
                 world.putBombAt(this, col, row)
             }
@@ -102,35 +104,19 @@ class Bomber(val world: World, animates: SpriteDirections): Person(animates) {
     fun releaseBomb() { bombCount-- }
 
     private suspend fun takeItem() {
-        val items = world.allTilesWithin(x, y, "item")
+        val items = world.allTilesWithin(x, y, "item") as List<Item>
         for(item in items) {
             if(distLessThan(x, y, item.x, item.y, 20.0)) {
                 VfsDB.getSound("sound/sfx/skeleton_walk.mp3").play().apply { volume = GameState.volume*0.2 }
-                when(item.type) {
-                    TileType.BOMB_INCR -> { world.updateBomb(++maxBomb) }
-                    TileType.HEALTH -> { world.updateHitPoint(++hitPoint) }
-                    TileType.FLAME -> { world.updateRadius(++explosionRadius) }
-                    TileType.ATTACK -> { world.updateAttack(++attack) }
-                    TileType.SPEEDUP -> { speed += 0.1 }
-                    TileType.KEY -> {
-                        world.gate?.isOpened = true
-                        world.gate?.open()
-                    }
-                    TileType.GATE -> {
-                        if(world.gate!!.isOpened) {
-                            world.notifyWin()
-                        }
-                    }
-                    else -> {}
-                }
-                if(item.type != TileType.GATE)
-                    world.getLayer("item")[(item.x/45.0).toInt(), (item.y/45.0).toInt()] = null
+                item.takeEffect(this)
                 break
             }
         }
     }
 
-    suspend fun decreaseHP(damage: Int) {
+    override suspend fun takeDamage(damage: Int) {
+        if(immune) return
+        immune = true
         VfsDB.getSound("sound/sfx/dummy_die.mp3").play().volume = GameState.volume*0.2
         hitPoint -= damage
         if (hitPoint < 1) {
@@ -144,6 +130,7 @@ class Bomber(val world: World, animates: SpriteDirections): Person(animates) {
         this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
         this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
         this.instance.colorMul = Colors["#ffffff"]
+        immune = false
     }
 }
 

@@ -1,12 +1,16 @@
 package entities.dynamics.enemy
 
 import com.soywiz.klock.*
+import com.soywiz.korge.tween.*
+import com.soywiz.korim.color.*
+import com.soywiz.korma.interpolation.*
 import core.base.*
 import entities.base.*
 import entities.dynamics.*
-import kotlin.random.*
+import load.*
+import ui.level.*
 
-abstract class Enemy(animates: SpriteDirections, val kind: MoveKind): Person(animates) {
+abstract class Enemy(val world: World, animates: SpriteDirections, val kind: MoveKind): Person(animates) {
 
     protected var direction: MoveDirection
 
@@ -20,11 +24,21 @@ abstract class Enemy(animates: SpriteDirections, val kind: MoveKind): Person(ani
     }
     abstract fun update()
 
-    fun changeDirection() {
-        direction = when(kind) {
-            MoveKind.HORIZONTAL -> if(direction == MoveDirection.LEFT) MoveDirection.RIGHT else MoveDirection.LEFT
-            MoveKind.VERTICAL -> if(direction == MoveDirection.DOWN) MoveDirection.UP else MoveDirection.DOWN
-            MoveKind.MIX -> MoveDirection.values()[Random.nextInt(0, 4)]
+    override suspend fun takeDamage(damage: Int) {
+        if(immune) return
+        immune = true
+        VfsDB.getSound("sound/sfx/dummy_die.mp3").play().volume = GameState.volume*0.2
+        hitPoint -= damage
+        if (hitPoint < 1) {
+            this.alive = false
+            this.removeFromParent()
         }
+        this.instance.colorMul = Colors["#ff7400"]
+        this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
+        this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
+        this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
+        this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
+        this.instance.colorMul = Colors["#ffffff"]
+        immune = false
     }
 }
