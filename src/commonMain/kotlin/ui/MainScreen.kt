@@ -1,21 +1,17 @@
 package ui
 
-import com.soywiz.kds.iterators.*
 import com.soywiz.klock.*
 import com.soywiz.korev.*
 import com.soywiz.korge.animate.*
 import com.soywiz.korge.input.*
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korge.tween.*
-import com.soywiz.korge.ui.*
 import com.soywiz.korge.view.*
-import com.soywiz.korge.view.tween.*
 import com.soywiz.korim.color.*
 import com.soywiz.korim.format.*
 import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
-import entities.*
 import entities.dynamics.*
 import entities.dynamics.enemy.*
 import load.*
@@ -42,6 +38,11 @@ class MainScreen(val info: EntryInfo): Scene() {
                         anchor(0.5, 0.5)
                         xy(45*e.pos.first + 23, 45*e.pos.second + 23)
                     }
+                    } else if(e.type == "SKELETON"){
+                    skeleton(e.kind) {
+                        anchor(0.5, 0.5)
+                        xy(45*e.pos.first + 23, 45*e.pos.second + 23)
+                    }
                     } else {
                     skeleton(e.kind) {
                         anchor(0.5, 0.5)
@@ -50,7 +51,7 @@ class MainScreen(val info: EntryInfo): Scene() {
                     }
                 )
             }
-            bomber = bomber {
+            player = bomber {
                 anchor(0.5, 0.5)
                 scale(0.775)
                 xy(45*mapInfo.player.first + 23, 45*mapInfo.player.second + 23)
@@ -128,7 +129,7 @@ class MainScreen(val info: EntryInfo): Scene() {
                         if(e.alive) launch { e.update() }
                     }
                 }
-                launch { bomber.update(input) }
+                launch { player.update(input) }
                 if (input.keys[Key.LEFT]) if (x < 0.0) x++
                 if (input.keys[Key.RIGHT]) if (x > -265.0) x--
             }

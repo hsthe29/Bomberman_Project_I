@@ -2,10 +2,13 @@ package entities.dynamics.enemy
 
 import com.soywiz.korge.view.*
 import com.soywiz.korim.format.*
+import com.soywiz.korio.async.*
 import com.soywiz.korio.file.std.*
 import core.base.*
+import core.physics.*
 import entities.base.*
 import ui.level.*
+import kotlin.coroutines.*
 
 suspend inline fun World.ghost(kind: MoveKind, callback: @ViewDslMarker Ghost.() -> Unit = {}): Ghost {
     val spriteMap = resourcesVfs["character/ghost.png"].readBitmap()
@@ -14,12 +17,15 @@ suspend inline fun World.ghost(kind: MoveKind, callback: @ViewDslMarker Ghost.()
     return ghost
 }
 
-class Ghost(world: World, animates: SpriteDirections, kind: MoveKind): Enemy(world, animates, kind) {
+class Ghost(world: World, animates: SpriteDirections, kind: MoveKind): Enemy(world, animates, kind), Attackable {
     override var hitPoint = 3
     override var attack = 1
     override var speed = 0.9
 
-    override fun update() {
+    override fun dealDamage() = attack
+
+    override suspend fun update() {
+        if(frozen) return
         val tiles = world.allTilesWithin(x, y)
         val (left, right, up, down) = feasibleDirection(speed, tiles)
 
@@ -45,25 +51,9 @@ class Ghost(world: World, animates: SpriteDirections, kind: MoveKind): Enemy(wor
                 else direction = MoveDirection.LEFT
             }
         }
-    }
-
-    override fun move(dir: MoveDirection) {
-        when(dir) {
-            MoveDirection.LEFT -> {
-                x -= speed
-                play(animates.left)
-            }
-            MoveDirection.RIGHT -> {
-                x += speed
-                play(animates.right)
-            }
-            MoveDirection.UP -> {
-                y -= speed
-                play(animates.up)
-            }
-            MoveDirection.DOWN -> {
-                y += speed
-                play(animates.down)
+        if(distLessThan(x, y, world.player.x, world.player.y, 15.0)) {
+            launch(coroutineContext) {
+                world.player.takeDamage(dealDamage())
             }
         }
     }

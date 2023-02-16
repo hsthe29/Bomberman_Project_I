@@ -8,29 +8,53 @@ import core.algorithm.*
 import core.base.*
 import core.physics.*
 import entities.base.*
+import entities.bomb.*
 import ui.level.*
 import kotlin.coroutines.*
 
-suspend inline fun World.skeleton(kind: MoveKind, callback: @ViewDslMarker Skeleton.() -> Unit = {}): Skeleton {
-    val spriteMap = resourcesVfs["character/skeleton.png"].readBitmap()
-    val skeleton = Skeleton(this, skeletonAnimations(spriteMap), kind).apply(callback)
-    skeleton.instance.addTo(this)
-    return skeleton
+suspend inline fun World.boss(kind: MoveKind, callback: @ViewDslMarker Boss.() -> Unit = {}): Boss {
+    val spriteMap = resourcesVfs["character/boss.png"].readBitmap()
+    val boss = Boss(this, skeletonAnimations(spriteMap), kind).apply(callback)
+    boss.instance.addTo(this)
+    return boss
 }
 
-class Skeleton(world: World, animates: SpriteDirections, kind: MoveKind): Enemy(world, animates, kind), Attackable {
-    override var hitPoint = 6
-    override var attack = 2
-    override var speed = 2.0
-    private val baseSpeed = 0.5
+class Boss(world: World, animates: SpriteDirections, kind: MoveKind,
+
+) : Enemy(world, animates, kind), Bomber  {
+    override var attack = 3
+    override var type: BombType = BombType.FROST
+    override var explosionRadius = 6
+    override var hitPoint = 11
+    override var speed = 0.6
+    private val baseSpeed = 0.6
     private var last = System.currentTimeMillis() // milliseconds
+    private var putBombTime = 0L
     private var paths = ArrayDeque<SquareCoordinate>()
+    override suspend fun putBomb() {
+        val now = System.currentTimeMillis()
+        if(now - putBombTime > 1500) { // 1.5 secs
+            val row = (this.y/45.0).toInt()
+            val col = (this.x/45.0).toInt()
+            if(!world.stoneLayer.occupied(col, row)) {
+                world.stoneLayer.magicBomb(this, col, row) {
+                    trigger()
+                }
+                putBombTime = now
+            }
+        }
+    }
+
+    override fun releaseBomb() {
+        TODO("Not yet implemented")
+    }
 
     override fun dealDamage() = attack
+
     override suspend fun update() {
-        if(frozen) return
+        if(paths.size < 8) launch(coroutineContext) { putBomb() }
         val now = System.currentTimeMillis()
-        if(now - last > 1500) {
+        if(now - last > 2000) {
             val pathJob = async(coroutineContext) {
                 PathFinder.evalShortestPath(world.stoneLayer.export(), this.square(), world.player.square())
             }

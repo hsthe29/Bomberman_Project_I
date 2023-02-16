@@ -11,6 +11,7 @@ import com.soywiz.korio.file.std.*
 import com.soywiz.korma.interpolation.*
 import core.base.*
 import entities.*
+import entities.base.*
 import entities.bomb.*
 import entities.dynamics.*
 import entities.dynamics.enemy.*
@@ -19,7 +20,6 @@ import entities.statics.items.Gate
 import kotlinx.coroutines.*
 import load.*
 import ui.*
-import java.security.InvalidKeyException
 import kotlin.coroutines.*
 import kotlin.math.max
 import kotlin.math.min
@@ -45,7 +45,7 @@ class World(val screen: MainScreen): Container() {
     val bombInfo: Pair<Image, Text>
     val flameInfo: Pair<Image, Text>
     val attackInfo: Pair<Image, Text>
-    lateinit var bomber: Bomber
+    lateinit var player: Player
     val enemies = arrayListOf<Enemy>()
 
     lateinit var gate: Gate
@@ -66,10 +66,10 @@ class World(val screen: MainScreen): Container() {
     }
 
     fun loadText() {
-        hpInfo.second.text = "x${bomber.hitPoint}"
-        bombInfo.second.text = "x${bomber.maxBomb}"
-        flameInfo.second.text = "x${bomber.explosionRadius}"
-        attackInfo.second.text = "x${bomber.attack}"
+        hpInfo.second.text = "x${player.hitPoint}"
+        bombInfo.second.text = "x${player.maxBomb}"
+        flameInfo.second.text = "x${player.explosionRadius}"
+        attackInfo.second.text = "x${player.attack}"
     }
 
     fun addLayer(layer: Layer, callback: @ViewDslMarker Layer.() -> Unit = {}) {
@@ -147,11 +147,11 @@ class World(val screen: MainScreen): Container() {
         attackInfo.second.text = "x$value"
     }
 
-    suspend fun putBombAt(player: Bomber, col: Int, row: Int) {
-        stoneLayer.bomb(col, row) {
-            ticking(player)
-        }
-    }
+//    suspend fun putBombAt(bomber: Bomber, col: Int, row: Int) {
+//        stoneLayer.bomb(col, row) {
+//            ticking(player)
+//        }
+//    }
 
     suspend fun notifyGameOver() {
         this.screen.showGameOver()

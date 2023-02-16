@@ -9,7 +9,6 @@ import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.annotations.ViewDslMarker
 import com.soywiz.korma.interpolation.*
-import entities.dynamics.*
 import load.*
 import ui.*
 

@@ -52,4 +52,12 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
     fun occupied(col: Int, row: Int): Boolean {
         return data[col][row] != null
     }
+
+    fun export(): Array<IntArray> {
+        val res = Array(37) { IntArray(17) { 1 } }
+        for(p in positions) {
+            res[p.first][p.second] = 0
+        }
+        return res
+    }
 }

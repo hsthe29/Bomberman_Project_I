@@ -9,7 +9,6 @@ import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.annotations.ViewDslMarker
 import com.soywiz.korma.interpolation.*
-import entities.*
 import load.*
 import ui.*
 
@@ -36,6 +35,11 @@ class WonBase(private val scene: MainScreen): Container() {
                     this@WonBase.removeFromParent()
                     MainScreen(GameState.nextEntry(scene.info.nextEntry))
                 })
+            }
+        }
+        if(GameState.nextEntryLevel == Pair(1, 0)) {
+            image(resourcesVfs["items/earned.png"].readBitmap(), 0.5, 0.5) {
+                xy(700.0, 450.0)
             }
         }
         show(0.5.seconds, Easing.EASE_IN)

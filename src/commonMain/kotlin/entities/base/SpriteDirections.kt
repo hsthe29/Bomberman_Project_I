@@ -2,8 +2,6 @@ package entities.base
 
 import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.*
-import entities.dynamics.*
-import load.*
 
 data class SpriteDirections(val left: SpriteAnimation, val right: SpriteAnimation, val up: SpriteAnimation, val down: SpriteAnimation)
 
@@ -89,7 +87,7 @@ fun skeletonAnimations(spriteMap: Bitmap) = SpriteDirections(
     left = SpriteAnimation(
         spriteMap = spriteMap,
         spriteWidth = 40,
-        spriteHeight = 27,
+        spriteHeight = 47,
         marginTop = 0,
         marginLeft = 0,
         columns = 6,
@@ -124,7 +122,7 @@ fun skeletonAnimations(spriteMap: Bitmap) = SpriteDirections(
     )
 )
 
-fun redExplosionAnimation(spriteMap: Bitmap) = SpriteAnimation(
+fun explosionAnimation(spriteMap: Bitmap) = SpriteAnimation(
         spriteMap = spriteMap,
         spriteWidth = 45,
         spriteHeight = 45,

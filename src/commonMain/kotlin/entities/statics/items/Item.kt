@@ -3,7 +3,6 @@ package entities.statics.items
 import com.soywiz.korim.bitmap.*
 import entities.dynamics.*
 import entities.statics.*
-import load.*
 
 abstract class Item(bitmap: Bitmap): Tile(bitmap) {
 
@@ -15,6 +14,6 @@ abstract class Item(bitmap: Bitmap): Tile(bitmap) {
         scale(0.5, 0.5)
     }
 
-    abstract suspend fun takeEffect(bomber: Bomber)
+    abstract suspend fun takeEffect(player: Player)
 
 }

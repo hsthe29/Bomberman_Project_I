@@ -1,9 +1,7 @@
 package entities.statics.items
 
 import com.soywiz.korge.view.*
-import core.base.*
 import entities.dynamics.*
-import entities.statics.*
 import load.*
 import ui.level.*
 
@@ -21,7 +19,7 @@ class HPItem(val layer: Layer,
         y = 45.0*info.row + 23.0
     }
 
-    override suspend fun takeEffect(bomber: Bomber) {
+    override suspend fun takeEffect(bomber: Player) {
         bomber.world.updateHitPoint(++bomber.hitPoint)
         bomber.world.itemLayer[col, row] = null
     }

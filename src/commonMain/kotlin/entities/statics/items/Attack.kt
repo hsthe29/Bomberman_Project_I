@@ -21,7 +21,7 @@ class Attack(val layer: Layer,
         y = 45.0*info.row + 22.0
     }
 
-    override suspend fun takeEffect(bomber: Bomber) {
+    override suspend fun takeEffect(bomber: Player) {
         bomber.world.updateAttack(++bomber.attack)
         bomber.world.itemLayer[col, row] = null
     }

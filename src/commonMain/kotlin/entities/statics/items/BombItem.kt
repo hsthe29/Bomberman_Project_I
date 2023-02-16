@@ -1,9 +1,7 @@
 package entities.statics.items
 
 import com.soywiz.korge.view.*
-import com.soywiz.korgw.platform.*
 import entities.dynamics.*
-import entities.statics.*
 import load.*
 import ui.level.*
 
@@ -22,7 +20,7 @@ class BombItem(val layer: Layer,
         y = 45.0*info.row + 22.0
     }
 
-    override suspend fun takeEffect(bomber: Bomber) {
+    override suspend fun takeEffect(bomber: Player) {
         bomber.world.updateBomb(++bomber.maxBomb)
         bomber.world.itemLayer[col, row] = null
     }

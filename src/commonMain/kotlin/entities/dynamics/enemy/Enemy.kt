@@ -10,7 +10,7 @@ import entities.dynamics.*
 import load.*
 import ui.level.*
 
-abstract class Enemy(val world: World, animates: SpriteDirections, val kind: MoveKind): Person(animates) {
+abstract class Enemy(world: World, animates: SpriteDirections, val kind: MoveKind): Person(world, animates) {
 
     protected var direction: MoveDirection
 
@@ -22,9 +22,9 @@ abstract class Enemy(val world: World, animates: SpriteDirections, val kind: Mov
             else -> { animates.right }
         })
     }
-    abstract fun update()
+    abstract suspend fun update()
 
-    override suspend fun takeDamage(damage: Int) {
+    override suspend fun takeDamage(damage: Int, freeze: Boolean) {
         if(immune) return
         immune = true
         VfsDB.getSound("sound/sfx/dummy_die.mp3").play().volume = GameState.volume*0.2
@@ -33,12 +33,18 @@ abstract class Enemy(val world: World, animates: SpriteDirections, val kind: Mov
             this.alive = false
             this.removeFromParent()
         }
-        this.instance.colorMul = Colors["#ff7400"]
-        this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
-        this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
-        this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
-        this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
-        this.instance.colorMul = Colors["#ffffff"]
-        immune = false
+        if(freeze) {
+            immune = false
+            freeze()
+        }
+        else {
+            this.instance.colorMul = Colors["#ff7400"]
+            this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
+            this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
+            this.instance.tween(this.instance::alpha[1.0, 0.4], time = 0.3.seconds, easing = Easing.EASE_IN)
+            this.instance.tween(this.instance::alpha[0.4, 1.0], time = 0.3.seconds, easing = Easing.EASE_IN)
+            this.instance.colorMul = Colors["#ffffff"]
+            immune = false
+        }
     }
 }

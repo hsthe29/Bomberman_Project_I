@@ -2,9 +2,7 @@ package entities.statics.items
 
 import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.*
-import core.base.*
 import entities.dynamics.*
-import entities.statics.*
 import load.*
 import ui.level.*
 
@@ -25,7 +23,7 @@ class Gate(val layer: Layer, info: TileInfo, anchorX: Double = 0.5,
         y = 45.0*info.row + 22.0
     }
 
-    override suspend fun takeEffect(bomber: Bomber) {
+    override suspend fun takeEffect(bomber: Player) {
         if(bomber.world.gate.isOpened) {
             bomber.world.notifyWin()
         }

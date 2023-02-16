@@ -1,9 +1,7 @@
 package entities.statics.items
 
 import com.soywiz.korma.annotations.*
-import core.base.*
 import entities.dynamics.*
-import entities.statics.*
 import load.*
 import ui.level.*
 
@@ -21,7 +19,7 @@ class Speed(val layer: Layer,
         y = 45.0*info.row + 22.0
     }
 
-    override suspend fun takeEffect(bomber: Bomber) {
+    override suspend fun takeEffect(bomber: Player) {
         bomber.speed += 0.1
         bomber.world.itemLayer[col, row] = null
     }
