@@ -1,15 +1,16 @@
 package entities.statics.items
 
-import com.soywiz.korma.annotations.*
+import com.soywiz.korge.view.*
 import entities.dynamics.*
 import load.*
 import ui.level.*
 
-class Speed(val layer: Layer,
-             info: TileInfo)
+class RadiusIncrease(val layer: Layer,
+                     info: TileInfo)
     : Item(bitmap = VfsDB.getBitmap(info.url)) {
 
     override val type = TileType.FLAME
+
     override val row = info.row
     override val col = info.col
 
@@ -20,12 +21,11 @@ class Speed(val layer: Layer,
     }
 
     override suspend fun takeEffect(bomber: Player) {
-        bomber.speed += 0.1
+        bomber.world.updateRadius(++bomber.explosionRadius)
         bomber.world.itemLayer[col, row] = null
     }
 }
 
-inline fun Layer.speed(info: TileInfo, callback: @ViewDslMarker Speed.() -> Unit = {}): Speed {
-    return Speed(this, info).apply(callback)
+inline fun Layer.radiusIncrease(info: TileInfo, callback: @ViewDslMarker RadiusIncrease.() -> Unit = {}): RadiusIncrease {
+    return RadiusIncrease(this, info).apply(callback)
 }
-

@@ -32,7 +32,7 @@ class Player(world: World, animates: SpriteDirections): Person(world, animates),
     override var attack: Int = 1
 
     var maxBomb = 1
-    var bombCount = 0
+    private var bombCount = 0
     override var explosionRadius = 2
     override var type = BombType.EXPLOSION
 

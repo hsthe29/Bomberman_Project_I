@@ -13,16 +13,16 @@ class Layer(var world: World, val layerName:String = "object", tiles: List<TileI
     init {
         tiles.forEach {
             when(it.type) {
-                TileType.HEALTH -> hpItem(it)
+                TileType.HEALTH -> healing(it)
                 TileType.KEY -> key(it)
-                TileType.BOMB_INCR -> bombItem(it)
+                TileType.BOMB_INCR -> bombIncrease(it)
                 TileType.GATE -> gate(it)
-                TileType.FLAME -> flameItem(it)
+                TileType.FLAME -> radiusIncrease(it)
                 TileType.ATTACK -> attack(it)
                 TileType.BRICK -> brick(it)
                 TileType.STONE -> stone(it)
                 TileType.GROUND -> ground(it)
-                TileType.SPEEDUP -> speed(it)
+                TileType.SPEEDUP -> speedup(it)
                 else -> {
                     println("default")
                 }

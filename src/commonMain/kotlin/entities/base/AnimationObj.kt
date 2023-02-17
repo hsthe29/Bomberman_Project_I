@@ -5,13 +5,12 @@ import com.soywiz.korge.view.*
 import com.soywiz.korio.async.*
 
 abstract class AnimationObj(animation: SpriteAnimation): GameObject() {
-    var spriteDisplayTime: TimeSpan = 50.milliseconds
     private val sprite = Sprite(animation)
     override val instance: BaseImage = sprite
     val onAnimationCompleted: Signal<SpriteAnimation>
         get() = sprite.onAnimationCompleted
     fun play(animation: SpriteAnimation,
-             spriteDisplayTime: TimeSpan = getDefaultTime(animation),
+             spriteDisplayTime: TimeSpan = animation.defaultTimePerFrame,
              startFrame: Int = -1,
              endFrame: Int = 0,
              reversed: Boolean = false) {
@@ -20,10 +19,5 @@ abstract class AnimationObj(animation: SpriteAnimation): GameObject() {
 
     fun stop() {
         sprite.stopAnimation()
-    }
-
-    private fun getDefaultTime(spriteAnimation: SpriteAnimation?): TimeSpan = when {
-        spriteAnimation != null && spriteAnimation.defaultTimePerFrame != TimeSpan.NIL -> spriteAnimation.defaultTimePerFrame
-        else -> spriteDisplayTime
     }
 }

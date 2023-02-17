@@ -1,16 +1,15 @@
 package entities.statics.items
 
-import com.soywiz.korge.view.*
+import com.soywiz.korma.annotations.*
 import entities.dynamics.*
 import load.*
 import ui.level.*
 
-class BombItem(val layer: Layer,
-               info: TileInfo)
+class Speedup(val layer: Layer,
+              info: TileInfo)
     : Item(bitmap = VfsDB.getBitmap(info.url)) {
 
-    override val type = TileType.BOMB_INCR
-
+    override val type = TileType.FLAME
     override val row = info.row
     override val col = info.col
 
@@ -21,11 +20,12 @@ class BombItem(val layer: Layer,
     }
 
     override suspend fun takeEffect(bomber: Player) {
-        bomber.world.updateBomb(++bomber.maxBomb)
+        bomber.speed += 0.1
         bomber.world.itemLayer[col, row] = null
     }
 }
 
-inline fun Layer.bombItem(info: TileInfo, callback: @ViewDslMarker BombItem.() -> Unit = {}): BombItem {
-    return BombItem(this, info).apply(callback)
+inline fun Layer.speedup(info: TileInfo, callback: @ViewDslMarker Speedup.() -> Unit = {}): Speedup {
+    return Speedup(this, info).apply(callback)
 }
+
