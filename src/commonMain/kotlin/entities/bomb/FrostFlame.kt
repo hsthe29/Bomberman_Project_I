@@ -18,21 +18,22 @@ class FrostFlame(layer: Layer, source: FrostBomb, dir: Int, col: Int, row: Int,
 
     override suspend fun fire() {
         val player = layer.world.player
+        val belongToPlayer = source.owner is Player
         launch(coroutineContext) {
             if(withinSquare(Pair(player.x, player.y), this.loc)) {
                 launch(coroutineContext) {
                     player.takeDamage(source.owner.dealDamage(), freeze = true)
                 }
             }
-
-            launch(coroutineContext) {
-                for (e in layer.world.enemies)
-                    if(e.alive && withinSquare(Pair(e.x, e.y), this.loc)) {
-                        launch(coroutineContext) {
-                            e.takeDamage(player.dealDamage(), freeze = true)
+            if(belongToPlayer)
+                launch(coroutineContext) {
+                    for (e in layer.world.enemies)
+                        if(e.alive && withinSquare(Pair(e.x, e.y), this.loc)) {
+                            launch(coroutineContext) {
+                                e.takeDamage(player.dealDamage(), freeze = true)
+                            }
                         }
-                    }
-            }
+                }
 
             launch(coroutineContext) {
                 play(animation, spriteDisplayTime = 50.milliseconds)
@@ -44,8 +45,8 @@ class FrostFlame(layer: Layer, source: FrostBomb, dir: Int, col: Int, row: Int,
                 val stoneLayer = layer.world.stoneLayer
                 if(stoneLayer.occupied(col, row)) {
                     if(dir > -1)
-                    source.block[dir] = true
-                    if(stoneLayer[col, row] is Brick) { stoneLayer[col, row] = null }
+                        source.block[dir] = true
+                    if(belongToPlayer && stoneLayer[col, row] is Brick) { stoneLayer[col, row] = null }
                 }
             }
         }

@@ -28,7 +28,7 @@ suspend inline fun World.bomber(callback: @ViewDslMarker Player.() -> Unit = {})
 }
 class Player(world: World, animates: SpriteDirections): Person(world, animates), Bomber {
     override var speed: Double = 1.0
-    override var hitPoint: Int = 300
+    override var hitPoint: Int = 3
     override var attack: Int = 1
 
     var maxBomb = 1

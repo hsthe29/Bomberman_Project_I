@@ -18,14 +18,15 @@ class FrostBomb(layer: Layer, owner: Bomber, col: Int, row: Int)
 
     override suspend fun blast() {
         val r = owner.explosionRadius
-        CoroutineScope(coroutineContext).launch(start=CoroutineStart.DEFAULT) {
-            FrostFlame(
-                layer = layer,
-                source = this@FrostBomb,
-                dir = -1,
-                col = this@FrostBomb.col,
-                row = this@FrostBomb.row).fire()
-        }
+        if(owner is Player)
+            CoroutineScope(coroutineContext).launch(start=CoroutineStart.DEFAULT) {
+                FrostFlame(
+                    layer = layer,
+                    source = this@FrostBomb,
+                    dir = -1,
+                    col = this@FrostBomb.col,
+                    row = this@FrostBomb.row).fire()
+            }
         for(c in 1 .. r) {
             delay(80.milliseconds)
             val jobs = arrayListOf<Job>()

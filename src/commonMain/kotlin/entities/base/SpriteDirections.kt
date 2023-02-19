@@ -122,6 +122,45 @@ fun skeletonAnimations(spriteMap: Bitmap) = SpriteDirections(
     )
 )
 
+fun bossAnimations(spriteMap: Bitmap) = SpriteDirections(
+    left = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 45,
+        spriteHeight = 45,
+        marginTop = 45,
+        marginLeft = 0,
+        columns = 9,
+        rows = 1
+    ),
+    right = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 45,
+        spriteHeight = 45,
+        marginTop = 135,
+        marginLeft = 0,
+        columns = 9,
+        rows = 1
+    ),
+    up = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 45,
+        spriteHeight = 45,
+        marginTop = 0,
+        marginLeft = 0,
+        columns = 9,
+        rows = 1
+    ),
+    down = SpriteAnimation(
+        spriteMap = spriteMap,
+        spriteWidth = 45,
+        spriteHeight = 45,
+        marginTop = 90,
+        marginLeft = 0,
+        columns = 9,
+        rows = 1
+    )
+)
+
 fun explosionAnimation(spriteMap: Bitmap) = SpriteAnimation(
         spriteMap = spriteMap,
         spriteWidth = 45,

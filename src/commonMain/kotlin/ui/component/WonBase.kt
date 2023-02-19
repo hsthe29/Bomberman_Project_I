@@ -41,6 +41,10 @@ class WonBase(private val scene: MainScreen): Container() {
             image(resourcesVfs["items/earned.png"].readBitmap(), 0.5, 0.5) {
                 xy(700.0, 450.0)
             }
+        } else if (GameState.nextEntryLevel == Pair(-1, -1)) {
+            image(resourcesVfs["items/earned.png"].readBitmap(), 0.5, 0.5) {
+                xy(700.0, 450.0)
+            }
         }
         show(0.5.seconds, Easing.EASE_IN)
     }

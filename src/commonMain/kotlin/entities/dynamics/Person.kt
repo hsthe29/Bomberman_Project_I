@@ -52,16 +52,16 @@ abstract class Person(val world: World, protected val animates: SpriteDirections
         val ret = booleanArrayOf(true, true, true, true)
         for(tile in tiles) {
             if(tile is Bomb) {
-                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y-delta, 20.0), tile.boundRectangle())) {
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y-delta, 18.0), tile.boundRectangle())) {
                     if(tile.lockMove) ret[2] = false
                 } else tile.lockMove = true
-                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y+delta, 20.0), tile.boundRectangle())) {
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x, y+delta, 18.0), tile.boundRectangle())) {
                     if(tile.lockMove) ret[3] = false
                 } else tile.lockMove = true
-                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x-delta, y, 20.0), tile.boundRectangle())) {
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x-delta, y, 18.0), tile.boundRectangle())) {
                     if(tile.lockMove) ret[0] = false
                 } else tile.lockMove = true
-                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x+delta, y, 20.0), tile.boundRectangle())) {
+                if(Collider.collideBetweenCircleAndRectangle(makeCircle(x+delta, y, 18.0), tile.boundRectangle())) {
                     if(tile.lockMove) ret[1] = false
                 } else tile.lockMove = true
                 continue

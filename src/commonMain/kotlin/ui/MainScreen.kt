@@ -35,17 +35,14 @@ class MainScreen(val info: EntryInfo): Scene() {
             for(e in mapInfo.enemies) {
                 enemies.add(if(e.type == "GHOST") {
                     ghost(e.kind){
-                        anchor(0.5, 0.5)
                         xy(45*e.pos.first + 23, 45*e.pos.second + 23)
                     }
                     } else if(e.type == "SKELETON"){
                     skeleton(e.kind) {
-                        anchor(0.5, 0.5)
                         xy(45*e.pos.first + 23, 45*e.pos.second + 23)
                     }
                     } else {
-                    skeleton(e.kind) {
-                        anchor(0.5, 0.5)
+                    boss(e.kind) {
                         xy(45*e.pos.first + 23, 45*e.pos.second + 23)
                     }
                     }

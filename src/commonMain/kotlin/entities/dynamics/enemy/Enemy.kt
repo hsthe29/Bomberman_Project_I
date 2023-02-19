@@ -15,6 +15,7 @@ abstract class Enemy(world: World, animates: SpriteDirections, val kind: MoveKin
     protected var direction: MoveDirection
 
     init {
+        anchor(0.5, 0.5)
         direction = if(kind == MoveKind.HORIZONTAL) MoveDirection.LEFT else MoveDirection.DOWN
         play(when(direction) {
             MoveDirection.LEFT -> animates.left
