@@ -4,7 +4,7 @@ import kotlin.math.*
 
 object Collider {
 
-    inline fun distBetween(point1: Pair<Double, Double>, point2: Pair<Double, Double>): Double {
+    fun distBetween(point1: Pair<Double, Double>, point2: Pair<Double, Double>): Double {
         val deltaX = point1.first - point2.first
         val deltaY = point1.second - point2.second
         return java.lang.Math.sqrt(deltaX*deltaX + deltaY*deltaY)
